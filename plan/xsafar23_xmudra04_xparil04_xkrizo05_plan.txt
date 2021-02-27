@@ -29,6 +29,7 @@
 4.4.2021:
 - Profilling matematické knihovny
 - PGO
+
 11.4.2021:
 - Integrace grafického rozhraní a matematické knihovny
 - Instalátor
