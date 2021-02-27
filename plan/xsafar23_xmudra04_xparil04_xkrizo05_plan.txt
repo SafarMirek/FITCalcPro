@@ -1,0 +1,112 @@
+Čas začátku práce na projektu: 27.2.2021
+
+-------------------------------------------------
+Časový plán projektu:
+
+28.2.2021:
+- Dokončení plánu projektu
+
+5.3.2021:
+- Rozhraní matematické knihovny
+
+7.3.2021:
+- Testy matematické knihovny
+- Mockup základní verze kalkulačky
+
+18.3.2021 - Odevzdání plánu projektu
+
+21.3.2021:
+- Matematická knihovna
+
+26.3.2021:
+- Doxygen dokumentace
+
+28.3.2021:
+- Grafické rozhraní
+- Ladění matematické knihovny
+- Makefile
+
+4.4.2021:
+- Profilling matematické knihovny
+- PGO
+11.4.2021:
+- Integrace grafického rozhraní a matematické knihovny
+- Instalátor
+
+18.4.2021 - Dokončení projektu
+- Kontrola všech funkcí kalkulačky
+- Mockup další verze kalkulačky
+- Nápověda
+- Uživatelská příručka
+- README
+
+30.4.2021 - Odevzdání projektu
+- Zhodnocení projektu
+
+9.5.2021:
+- Zkušební instalace kalkulačky
+- Vytvoření prezentace
+
+22.5.2021:
+- Odevzdání osobního zhodnocení
+
+-------------------------------------------------
+Rozdělení úkolů:
+
+Celotýmové úkoly:
+- Mockup další verze kalkulačky
+- Kontrola všech funkcí kalkulačky
+- Codereviews
+- Prezentace
+
+Miroslav Šafář (xsafar23):
+- Připravení Git repozitáře
+- Vytvoření rozhraní matematické knihovny
+- Testy matematické knihovny
+- Makefile
+- Instalátor
+
+Matěj Mudra (xmudra04):
+- Mockup rozhraní základní verze
+- Grafické rozhraní
+- Integrace matematické knihovny a GUI
+- Nápověda ke grafickému rozhraní
+
+Ondřej Kříž (xkrizo05):
+- Implementace matematické knihovny
+- Doxygen dokumentace
+- Debugging matematické knihovny
+
+Michaela Pařilová (xparil04):
+- Uživatelská příručka
+- README
+- Profilling matematické knihovny
+- PGO
+- Pomoc ostatním členům týmu
+
+-------------------------------------------------
+Nástroje a pravidla pro komunikaci:
+
+JetBrains Space:
+- Chatová komunikace, dokumentové úložiště
+- Každý člen týmu musí na otázky mířené na něho (označení) odpovědět do 72h.
+
+Discord:
+- Schůzky týmu - datum schůzky bude vždy domluven pomocí Space.
+- Každý člen týmu se musí zúčastnit každé schůzky týmu, pokud není omluven předem.
+
+GitHub:
+- Issues - Na každý úkol je vytvořena issue a je k ní přiřazen člen, jenž ji má splnit. Jsou vytvořené milestones k určitým datům podle plánu projektu.
+- Každý člen týmu je povinnen dokončit své issues ke stanoveným datům, případně se omluvit za nesplnění data a úkol dokončit v co nejdříve možném termínu, maximálně do 3 dnů.
+
+Telefon:
+- Všichni členové týmu mezi sebou sdíleli své telefonní číslo.
+
+-------------------------------------------------
+Systém pro správu verzí:
+
+Systém pro zprávu verzí: Git
+Hosting: GitHub
+
+Repozitář projektu je k nahlédnutí na: https://github.com/SafarMirek/FITCalcPro
+Je privátní a účtu ivskontrola byl udělen do něj přístup.
