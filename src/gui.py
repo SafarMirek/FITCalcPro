@@ -1,0 +1,1 @@
+# graficke uzivatelske rozhrani
