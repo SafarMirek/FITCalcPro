@@ -171,9 +171,48 @@ def test_sin_regular():
     assert math_lib.sin(360) == 0
     assert math_lib.sin(720) == 0
     assert math_lib.sin(1080) == 0
-    # TODO
 
 
 def test_sin_odd():
     for x in range(0, 360, 10):
         assert math_lib.sin(x) == -math_lib.sin(-x)
+
+
+def test_cos_regular():
+    assert math_lib.cos(-90) == 0
+    assert math_lib.cos(0) == 1
+    assert math_lib.cos(90) == 0
+    assert math_lib.cos(180) == -1
+    assert math_lib.cos(270) == 0
+    assert math_lib.cos(360) == 1
+    assert math_lib.cos(720) == 1
+    assert math_lib.cos(1080) == 1
+
+
+def test_cos_even():
+    for x in range(0, 360, 10):
+        assert math_lib.cos(x) == math_lib.cos(-x)
+
+
+def test_tan_regular():
+    assert math_lib.tan(-45) == -1
+    assert math_lib.tan(0) == 0
+    assert math_lib.tan(45) == 1
+
+
+def test_tan_increasing():
+    for x in range(-80, 80, 5):
+        assert math_lib.tan(x) < math_lib.tan(x + 5)
+
+
+def test_tan_odd():
+    for x in range(0, 89, 1):
+        assert math_lib.tan(x) == -math_lib.tan(-x)
+
+
+def test_tan_not_defined():
+    with pytest.raises(Exception):
+        math_lib.tan(90)
+
+    with pytest.raises(Exception):
+        math_lib.tan(270)
