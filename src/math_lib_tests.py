@@ -82,3 +82,98 @@ def test_divide_by_zero():
 
     with pytest.raises(Exception):
         math_lib.divide(0, 0)
+
+
+def test_factorial():
+    assert math_lib.factorial(0) == 1
+    assert math_lib.factorial(1) == 1
+    assert math_lib.factorial(2) == 2
+    assert math_lib.factorial(3) == 6
+    assert math_lib.factorial(4) == 24
+    assert math_lib.factorial(5) == 120
+    assert math_lib.factorial(10) == 3628800
+
+
+def test_power_regular():
+    assert math_lib.power(3, 4) == 81
+    assert math_lib.power(3, 5) == 243
+    assert math_lib.power(2, 6) == 64
+    assert math_lib.power(2, 7) == 128
+
+    for i in range(-10, 10):
+        assert math_lib.power(i, 2) == i * i
+        assert math_lib.power(i, 3) == i * i * i
+
+        assert math_lib.power(math_lib.power(i, 2), 3) == math_lib.power(i, 6)
+        assert math_lib.power(math_lib.power(i, 3), 2) == math_lib.power(i, 6)
+
+
+def test_power_one():
+    for i in range(-10, 10):
+        assert math_lib.power(1, i) == 1
+
+
+def test_power_to_one():
+    for i in range(-10, 10):
+        assert math_lib.power(i, 1) == i
+
+
+def test_power_to_zero():
+    for i in range(-10, 10):
+        assert math_lib.power(i, 0) == 1
+
+
+def test_nth_root_sqrt():
+    assert math_lib.nth_root(1, 2) == 1
+    assert math_lib.nth_root(4, 2) == 2
+    assert math_lib.nth_root(9, 2) == 3
+    assert math_lib.nth_root(16, 2) == 4
+    assert math_lib.nth_root(25, 2) == 5
+    assert math_lib.nth_root(225, 2) == 15
+
+    with pytest.raises(Exception):
+        math_lib.nth_root(-1, 2)
+
+
+def test_nth_root_regular():
+    assert math_lib.nth_root(27, 3) == 3
+    assert math_lib.nth_root(64, 3) == 4
+
+    assert math_lib.nth_root(8, 3) == 2
+    assert math_lib.nth_root(16, 4) == 2
+    assert math_lib.nth_root(32, 5) == 2
+
+    with pytest.raises(Exception):
+        math_lib.nth_root(-1, 4)
+
+
+def test_nth_root_zero():
+    for n in range(2, 10):
+        assert math_lib.nth_root(0, n) == 0
+
+
+def test_nth_root_one():
+    for n in range(2, 10):
+        assert math_lib.nth_root(1, n) == 1
+
+
+def test_nth_root_odd_negative_one():
+    for n in range(3, 11, 2):
+        assert math_lib.nth_root(-1, n) == -1
+
+
+def test_sin_regular():
+    assert math_lib.sin(-90) == -1
+    assert math_lib.sin(0) == 0
+    assert math_lib.sin(90) == 1
+    assert math_lib.sin(180) == 0
+    assert math_lib.sin(270) == -1
+    assert math_lib.sin(360) == 0
+    assert math_lib.sin(720) == 0
+    assert math_lib.sin(1080) == 0
+    # TODO
+
+
+def test_sin_odd():
+    for x in range(0, 360, 10):
+        assert math_lib.sin(x) == -math_lib.sin(-x)
