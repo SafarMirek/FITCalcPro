@@ -11,65 +11,9 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-from math_lib import *
 
 
 class Ui_mainWindow(object):
-    def __init__(self):
-        self.a_label = ""
-        self.b_label = ""
-
-    def add_number(self, text, purge):
-        if purge:
-            self.a_label = ""
-            self.action_label.setText(
-                QCoreApplication.translate("mainWindow", self.action_label, None))
-        else:
-            self.a_label += f"{text}"
-            self.action_label.setText(
-                QCoreApplication.translate("mainWindow", self.a_label, None))
-
-    def move_to_buffer(self, text, purge):
-        self.add_number("", True)
-        if purge:
-            self.b_label = ""
-            self.buffer_label.setText(QCoreApplication.translate("mainWindow", self.b_label, None))
-        else:
-            self.b_label += f"{text}"
-            self.buffer_label.setText(QCoreApplication.translate("mainWindow", self.b_label, None))
-
-    def convert_to_superscript(self, text):
-        sup_chars = {
-            0: u'\u2070',
-            1: u'\xb9',
-            2: u'\xb2',
-            3: u'\xb3',
-            4: u'\u2074',
-            5: u'\u2075',
-            6: u'\u2076',
-            7: u'\u2077',
-            8: u'\u2078',
-            9: u'\u2079'}
-        return sup_chars[text]
-
-    def number_button_press(self, text, is_superscript):
-        if is_superscript:
-            self.add_number(self.convert_to_superscript(text), False)
-        else:
-            self.add_number(text, False)
-
-    def function_button_press(self, text):
-        self.move_to_buffer(text, False)
-        # pokud je zde "=", tak se zavolá výpočet
-
-    def delete_char(self, delete_all):
-        if delete_all:
-            self.a_label = ""
-            self.action_label.setText(QCoreApplication.translate("mainWindow", self.a_label, None))
-        else:
-            self.a_label = self.a_label[:-1]
-            self.action_label.setText(QCoreApplication.translate("mainWindow", self.a_label, None))
-
     def setupUi(self, mainWindow):
         if not mainWindow.objectName():
             mainWindow.setObjectName(u"mainWindow")
@@ -100,22 +44,21 @@ class Ui_mainWindow(object):
         self.xpowery.setFont(font)
         self.xpowery.setAutoFillBackground(False)
         self.xpowery.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.xpowery.setFlat(True)
-        self.xpowery.clicked.connect(lambda: power(2,2))
 
         self.gridLayout.addWidget(self.xpowery, 0, 0, 1, 1)
 
@@ -128,20 +71,20 @@ class Ui_mainWindow(object):
         self.yrootx.setFont(font)
         self.yrootx.setAutoFillBackground(False)
         self.yrootx.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.yrootx.setFlat(True)
 
         self.gridLayout.addWidget(self.yrootx, 0, 1, 1, 1)
@@ -155,20 +98,20 @@ class Ui_mainWindow(object):
         self.twopowerx.setFont(font)
         self.twopowerx.setAutoFillBackground(False)
         self.twopowerx.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.twopowerx.setFlat(True)
 
         self.gridLayout.addWidget(self.twopowerx, 0, 2, 1, 1)
@@ -182,20 +125,20 @@ class Ui_mainWindow(object):
         self.tworootx.setFont(font)
         self.tworootx.setAutoFillBackground(False)
         self.tworootx.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.tworootx.setFlat(True)
 
         self.gridLayout.addWidget(self.tworootx, 0, 3, 1, 1)
@@ -209,20 +152,20 @@ class Ui_mainWindow(object):
         self.factorial.setFont(font)
         self.factorial.setAutoFillBackground(False)
         self.factorial.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.factorial.setFlat(True)
 
         self.gridLayout.addWidget(self.factorial, 0, 4, 1, 1)
@@ -236,20 +179,20 @@ class Ui_mainWindow(object):
         self.invertor.setFont(font)
         self.invertor.setAutoFillBackground(False)
         self.invertor.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.invertor.setFlat(True)
 
         self.gridLayout.addWidget(self.invertor, 1, 0, 1, 1)
@@ -263,20 +206,20 @@ class Ui_mainWindow(object):
         self.sin.setFont(font)
         self.sin.setAutoFillBackground(False)
         self.sin.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.sin.setFlat(True)
 
         self.gridLayout.addWidget(self.sin, 1, 1, 1, 1)
@@ -290,20 +233,20 @@ class Ui_mainWindow(object):
         self.cos.setFont(font)
         self.cos.setAutoFillBackground(False)
         self.cos.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.cos.setFlat(True)
 
         self.gridLayout.addWidget(self.cos, 1, 2, 1, 1)
@@ -317,20 +260,20 @@ class Ui_mainWindow(object):
         self.tan.setFont(font)
         self.tan.setAutoFillBackground(False)
         self.tan.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.tan.setFlat(True)
 
         self.gridLayout.addWidget(self.tan, 1, 3, 1, 1)
@@ -344,20 +287,20 @@ class Ui_mainWindow(object):
         self.pi.setFont(font)
         self.pi.setAutoFillBackground(False)
         self.pi.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.pi.setFlat(True)
 
         self.gridLayout.addWidget(self.pi, 1, 4, 1, 1)
@@ -371,22 +314,21 @@ class Ui_mainWindow(object):
         self.seven.setFont(font)
         self.seven.setAutoFillBackground(False)
         self.seven.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.seven.setFlat(True)
-        self.seven.clicked.connect(lambda: self.number_button_press(u"7", False))
 
         self.gridLayout.addWidget(self.seven, 2, 0, 1, 1)
 
@@ -399,22 +341,21 @@ class Ui_mainWindow(object):
         self.eight.setFont(font)
         self.eight.setAutoFillBackground(False)
         self.eight.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.eight.setFlat(True)
-        self.eight.clicked.connect(lambda: self.number_button_press(u"8", False))
 
         self.gridLayout.addWidget(self.eight, 2, 1, 1, 1)
 
@@ -427,22 +368,21 @@ class Ui_mainWindow(object):
         self.nine.setFont(font)
         self.nine.setAutoFillBackground(False)
         self.nine.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.nine.setFlat(True)
-        self.nine.clicked.connect(lambda: self.number_button_press(u"9", False))
 
         self.gridLayout.addWidget(self.nine, 2, 2, 1, 1)
 
@@ -455,22 +395,21 @@ class Ui_mainWindow(object):
         self.ac.setFont(font)
         self.ac.setAutoFillBackground(False)
         self.ac.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.ac.setFlat(True)
-        self.ac.clicked.connect(lambda: self.delete_char(True))
 
         self.gridLayout.addWidget(self.ac, 2, 3, 1, 1)
 
@@ -483,22 +422,21 @@ class Ui_mainWindow(object):
         self.delete.setFont(font)
         self.delete.setAutoFillBackground(False)
         self.delete.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.delete.setFlat(True)
-        self.delete.clicked.connect(lambda: self.delete_char(False))
 
         self.gridLayout.addWidget(self.delete, 2, 4, 1, 1)
 
@@ -511,20 +449,20 @@ class Ui_mainWindow(object):
         self.four.setFont(font)
         self.four.setAutoFillBackground(False)
         self.four.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.four.setFlat(True)
 
         self.gridLayout.addWidget(self.four, 3, 0, 1, 1)
@@ -538,22 +476,21 @@ class Ui_mainWindow(object):
         self.five.setFont(font)
         self.five.setAutoFillBackground(False)
         self.five.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.five.setFlat(True)
-        self.five.clicked.connect(lambda: self.number_button_press(u"5", False))
 
         self.gridLayout.addWidget(self.five, 3, 1, 1, 1)
 
@@ -566,22 +503,21 @@ class Ui_mainWindow(object):
         self.six.setFont(font)
         self.six.setAutoFillBackground(False)
         self.six.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.six.setFlat(True)
-        self.six.clicked.connect(lambda: self.number_button_press(u"6", False))
 
         self.gridLayout.addWidget(self.six, 3, 2, 1, 1)
 
@@ -594,20 +530,20 @@ class Ui_mainWindow(object):
         self.times.setFont(font)
         self.times.setAutoFillBackground(False)
         self.times.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.times.setFlat(True)
 
         self.gridLayout.addWidget(self.times, 3, 3, 1, 1)
@@ -621,20 +557,20 @@ class Ui_mainWindow(object):
         self.devide.setFont(font)
         self.devide.setAutoFillBackground(False)
         self.devide.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.devide.setFlat(True)
 
         self.gridLayout.addWidget(self.devide, 3, 4, 1, 1)
@@ -648,22 +584,21 @@ class Ui_mainWindow(object):
         self.one.setFont(font)
         self.one.setAutoFillBackground(False)
         self.one.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.one.setFlat(True)
-        self.one.clicked.connect(lambda: self.number_button_press(u"1", False))
 
         self.gridLayout.addWidget(self.one, 4, 0, 1, 1)
 
@@ -676,22 +611,21 @@ class Ui_mainWindow(object):
         self.two.setFont(font)
         self.two.setAutoFillBackground(False)
         self.two.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.two.setFlat(True)
-        self.two.clicked.connect(lambda: self.number_button_press(u"2", False))
 
         self.gridLayout.addWidget(self.two, 4, 1, 1, 1)
 
@@ -704,22 +638,21 @@ class Ui_mainWindow(object):
         self.three.setFont(font)
         self.three.setAutoFillBackground(False)
         self.three.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.three.setFlat(True)
-        self.three.clicked.connect(lambda: self.number_button_press(u"3", False))
 
         self.gridLayout.addWidget(self.three, 4, 2, 1, 1)
 
@@ -732,20 +665,20 @@ class Ui_mainWindow(object):
         self.plus.setFont(font)
         self.plus.setAutoFillBackground(False)
         self.plus.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.plus.setFlat(True)
 
         self.gridLayout.addWidget(self.plus, 4, 3, 1, 1)
@@ -759,20 +692,20 @@ class Ui_mainWindow(object):
         self.minus.setFont(font)
         self.minus.setAutoFillBackground(False)
         self.minus.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.minus.setFlat(True)
 
         self.gridLayout.addWidget(self.minus, 4, 4, 1, 1)
@@ -786,22 +719,21 @@ class Ui_mainWindow(object):
         self.comma.setFont(font)
         self.comma.setAutoFillBackground(False)
         self.comma.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.comma.setFlat(True)
-        self.comma.clicked.connect(lambda: self.number_button_press(u",", False))
 
         self.gridLayout.addWidget(self.comma, 5, 0, 1, 1)
 
@@ -814,22 +746,21 @@ class Ui_mainWindow(object):
         self.zero.setFont(font)
         self.zero.setAutoFillBackground(False)
         self.zero.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.zero.setFlat(True)
-        self.zero.clicked.connect(lambda: self.number_button_press(u"0", False))
 
         self.gridLayout.addWidget(self.zero, 5, 1, 1, 1)
 
@@ -842,20 +773,20 @@ class Ui_mainWindow(object):
         self.Ans.setFont(font)
         self.Ans.setAutoFillBackground(False)
         self.Ans.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.Ans.setFlat(True)
 
         self.gridLayout.addWidget(self.Ans, 5, 2, 1, 1)
@@ -869,20 +800,20 @@ class Ui_mainWindow(object):
         self.equals.setFont(font)
         self.equals.setAutoFillBackground(False)
         self.equals.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(20,20,20);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(200,200,200);\n"
-        "	color: rgb(30, 30, 30);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(20,20,20);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(200,200,200);\n"
+"	color: rgb(30, 30, 30);\n"
+"}")
         self.equals.setFlat(True)
 
         self.gridLayout.addWidget(self.equals, 5, 3, 1, 1)
@@ -896,20 +827,20 @@ class Ui_mainWindow(object):
         self.guide.setFont(font)
         self.guide.setAutoFillBackground(False)
         self.guide.setStyleSheet(u"QPushButton {\n"
-        "	border: 1px;\n"
-        "	background-color: rgb(160,160,160);\n"
-        "	color: rgb(0, 0, 0);\n"
-        "}\n"
-        "\n"
-        "QPushButton:hover {\n"
-        "	background-color: rgb(50,50,50);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}\n"
-        "\n"
-        "QPushButton:pressed {\n"
-        "	background-color: rgb(30,30,30);\n"
-        "	color: rgb(255, 255, 255);\n"
-        "}")
+"	border: 1px;\n"
+"	background-color: rgb(160,160,160);\n"
+"	color: rgb(0, 0, 0);\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color: rgb(50,50,50);\n"
+"	color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: rgb(30,30,30);\n"
+"	color: rgb(255, 255, 255);\n"
+"}")
         self.guide.setFlat(True)
 
         self.gridLayout.addWidget(self.guide, 5, 4, 1, 1)
@@ -920,35 +851,35 @@ class Ui_mainWindow(object):
         self.verticalLayout = QVBoxLayout(self.layoutWidget1)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.buffer_label = QLabel(self.layoutWidget1)
-        self.buffer_label.setObjectName(u"buffer_label")
-        self.buffer_label.setMaximumSize(QSize(400, 100))
+        self.label = QLabel(self.layoutWidget1)
+        self.label.setObjectName(u"label")
+        self.label.setMaximumSize(QSize(400, 100))
         font1 = QFont()
         font1.setPointSize(15)
-        self.buffer_label.setFont(font1)
-        self.buffer_label.setLayoutDirection(Qt.LeftToRight)
-        self.buffer_label.setStyleSheet(u"QLabel {\n"
+        self.label.setFont(font1)
+        self.label.setLayoutDirection(Qt.LeftToRight)
+        self.label.setStyleSheet(u"QLabel {\n"
 "	color: rgb(255,255,255)\n"
 "}")
-        self.buffer_label.setTextFormat(Qt.RichText)
-        self.buffer_label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.buffer_label.setMargin(15)
+        self.label.setTextFormat(Qt.RichText)
+        self.label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label.setMargin(15)
 
-        self.verticalLayout.addWidget(self.buffer_label)
+        self.verticalLayout.addWidget(self.label)
 
-        self.action_label = QLabel(self.layoutWidget1)
-        self.action_label.setObjectName(u"action_label")
-        self.action_label.setMaximumSize(QSize(400, 100))
-        self.action_label.setFont(font)
-        self.action_label.setLayoutDirection(Qt.LeftToRight)
-        self.action_label.setStyleSheet(u"QLabel {\n"
+        self.label_2 = QLabel(self.layoutWidget1)
+        self.label_2.setObjectName(u"label_2")
+        self.label_2.setMaximumSize(QSize(400, 100))
+        self.label_2.setFont(font)
+        self.label_2.setLayoutDirection(Qt.LeftToRight)
+        self.label_2.setStyleSheet(u"QLabel {\n"
 "	color: rgb(255,255,255)\n"
 "}")
-        self.action_label.setTextFormat(Qt.RichText)
-        self.action_label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.action_label.setMargin(15)
+        self.label_2.setTextFormat(Qt.RichText)
+        self.label_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_2.setMargin(15)
 
-        self.verticalLayout.addWidget(self.action_label)
+        self.verticalLayout.addWidget(self.label_2)
 
         mainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(mainWindow)
@@ -969,6 +900,7 @@ class Ui_mainWindow(object):
         self.retranslateUi(mainWindow)
 
         self.xpowery.setDefault(False)
+
 
         QMetaObject.connectSlotsByName(mainWindow)
     # setupUi
@@ -1005,7 +937,7 @@ class Ui_mainWindow(object):
         self.Ans.setText(QCoreApplication.translate("mainWindow", u"Ans", None))
         self.equals.setText(QCoreApplication.translate("mainWindow", u"=", None))
         self.guide.setText(QCoreApplication.translate("mainWindow", u"???", None))
-        self.buffer_label.setText(QCoreApplication.translate("mainWindow", u"TextLabel", None))
-        self.action_label.setText(QCoreApplication.translate("mainWindow", u"Zadejte p\u0159\u00edklad", None))
+        self.label.setText(QCoreApplication.translate("mainWindow", u"TextLabel", None))
+        self.label_2.setText(QCoreApplication.translate("mainWindow", u"Zadejte p\u0159\u00edklad", None))
         self.menuasd.setTitle(QCoreApplication.translate("mainWindow", u"N\u00e1pov\u011bda", None))
     # retranslateUi
