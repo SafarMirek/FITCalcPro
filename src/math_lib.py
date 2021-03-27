@@ -159,9 +159,7 @@ def sin(x):
         sine += power(-1, step) * k
         step += 1
         k = k * (x * x) / ((2 * step) * (2 * step + 1))
-        print("k:", k, "step:", step)
 
-    print("sinus:", sine)
     return round(sine, accuracy)
 
 
