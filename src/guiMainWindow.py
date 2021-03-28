@@ -19,6 +19,8 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from math_lib import *
+from math_interpreter import *
+from ButtonActions import *
 
 
 ##
@@ -32,6 +34,22 @@ class Ui_mainWindow(object):
         self.fnc_is_last = False
         self.num_is_ready = False
         self.operation_needed = False
+        self.members = []
+        self.operations = []
+        self.buttonActions = [
+            ButtonAction("sin", "sin({value}) ", lambda a: sin(a), True),
+            ButtonAction("cos", "cos({value}) ", lambda a: cos(a), True),
+            ButtonAction("tan", "tan({value}) ", lambda a: tan(a), True),
+            ButtonAction("factorial", "{value}! ", lambda a: factorial(a), True),
+            ButtonAction("twopowerx", "{value}! ", lambda a: power(a, 2), True),
+            ButtonAction("tworootx", "{value}! ", lambda a: nth_root(a, 2), True),
+            ButtonAction("plus", "{value} + ", "+", False),
+            ButtonAction("minus", "{value} - ", "-", False),
+            ButtonAction("times", "{value} * ", "*", False),
+            ButtonAction("devide", "{value} / ", "/", False),
+            ButtonAction("xpowery", "{value} ^ ", "power", False),
+            RootButtonAction("yrootx", "not_used", "root", lambda a: self.string_to_superscript(a)),
+        ]
 
     ##
     # @brief Přidá číslo do skece vstupů
@@ -125,6 +143,8 @@ class Ui_mainWindow(object):
         self.fnc_is_last = False
         self.num_is_ready = False
         self.operation_needed = False
+        self.operations = []
+        self.members = []
 
     ##
     # @brief Funkce vyvolaná stisknutím tlačítka
@@ -150,62 +170,33 @@ class Ui_mainWindow(object):
         if self.a_label == "" and self.operation_needed == False:
             return
 
-        if button == "sin" and self.num_is_ready:
-            self.move_to_buffer("sin(" + text + ") ", False)
-            self.num_is_ready = False
-            self.operation_needed = True
-        elif button == "cos" and self.num_is_ready:
-            self.move_to_buffer("cos(" + text + ") ", False)
-            self.num_is_ready = False
-            self.operation_needed = True
-        elif button == "tan" and self.num_is_ready:
-            self.move_to_buffer("tan(" + text + ") ", False)
-            self.num_is_ready = False
-            self.operation_needed = True
-        elif button == "invert" and self.num_is_ready:
-            if text != "":
-                self.move_to_buffer(int(text) * (-1), False)
-            self.num_is_ready = False
-            self.operation_needed = True
-        elif button == "plus":
-            self.fnc_is_last = True
-            self.operation_needed = False
-            self.move_to_buffer(text + " + ", False)
-        elif button == "minus":
-            self.fnc_is_last = True
-            self.operation_needed = False
-            self.move_to_buffer(text + " - ", False)
-        elif button == "times":
-            self.fnc_is_last = True
-            self.operation_needed = False
-            self.move_to_buffer(text + u" \u00B7 ", False)
-        elif button == "devide":
-            self.fnc_is_last = True
-            self.operation_needed = False
-            self.move_to_buffer(text + " / ", False)
-        elif button == "factorial" and self.num_is_ready:
-            self.move_to_buffer(text + u"! ", False)
-        elif button == "twopowerx" and self.num_is_ready:
-            self.move_to_buffer(text + self.convert_to_superscript(2) + " ", False)
-            self.num_is_ready = False
-            self.operation_needed = False
-        elif button == "tworootx" and self.num_is_ready:
-            self.move_to_buffer(u"\u00b2\u221a" + text + " ", False)
-            self.num_is_ready = False
-            self.operation_needed = False
-        elif button == "yrootx" and self.num_is_ready:
-            self.option = "yrootx"
-            self.move_to_buffer(self.string_to_superscript(text) + u"\u221a\u25a1", False)
-            self.num_is_ready = False
-        elif button == "xpowery" and self.num_is_ready:
-            self.option = "xpowery"
-            self.move_to_buffer(text + u"^\u25a1", False)
-            self.num_is_ready = False
-        elif button == "equals":
+        # TODO: Invert function
+
+        for buttonAction in self.buttonActions:
+            if buttonAction.name == button:
+                if "," in text:
+                    self.members.append(float(text))
+                else:
+                    self.members.append(int(text))
+                self.num_is_ready = False
+                self.add_number("", True)
+                self.move_to_buffer(buttonAction.get_formatted(text), False)
+
+                if buttonAction.instant:
+                    x = self.members.pop()
+                    self.members.append(buttonAction.operation(x))
+                else:
+                    self.operations.append(buttonAction.operation)
+
+        self.operation_needed = len(self.members) == len(self.operations) + 1
+
+        if button == "equals":
             self.move_to_buffer(text, False)
-            self.add_number("Vypocitano", False)
+            if text != "":
+                self.members.append(float(text))
             self.num_is_ready = False
             self.operation_needed = False
+            self.add_number(eval(self.members, self.operations), False)
 
     ##
     # @brief Odstraní charakter, nebo celý (action_label) spodní štítek
@@ -218,6 +209,12 @@ class Ui_mainWindow(object):
         else:
             self.a_label = self.a_label[:-1]
             self.action_label.setText(QCoreApplication.translate("mainWindow", self.a_label, None))
+
+    def decide_minus(self):
+        if self.a_label == "":
+            self.number_button_press(u"-", False)
+        else:
+            self.function_button_press(self.a_label, "minus")
 
     ##
     # @brief Inicializuje rozložení aplikace
@@ -939,7 +936,8 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.minus.setFlat(True)
-        self.minus.clicked.connect(lambda: self.function_button_press(self.a_label, "minus"))
+
+        self.minus.clicked.connect(lambda: self.decide_minus())
 
         self.gridLayout.addWidget(self.minus, 4, 4, 1, 1)
 
