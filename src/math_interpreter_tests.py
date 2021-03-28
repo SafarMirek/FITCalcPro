@@ -29,9 +29,34 @@ def test_two_members_division():
             assert math_interpreter.eval([i, j], ["/"]) == math_lib.divide(i, j)
 
 
+def test_two_members_power():
+    for i in range(-3, 3):
+        for j in range(1, 6):
+            assert math_interpreter.eval([i, j], ["power"]) == math_lib.power(i, j)
+
+
+def test_two_members_root():
+    for i in range(0, 10):
+        for j in range(1, 10):
+            assert math_interpreter.eval([j, i], ["root"]) == math_lib.nth_root(i, j)
+
+
 def test_division_by_zero():
     with pytest.raises(Exception):
         math_interpreter.eval([10, 0], ["/"])
+
+
+def test_invalid_nth_root_base():
+    with pytest.raises(ValueError):
+        math_interpreter.eval([0, 10], ["root"])
+
+    with pytest.raises(ValueError):
+        math_interpreter.eval([1.5, 10], ["root"])
+
+
+def test_invalid_power_exp():
+    with pytest.raises(ValueError):
+        math_interpreter.eval([5, 0.5], ["power"])
 
 
 def test_tree_members_sum():

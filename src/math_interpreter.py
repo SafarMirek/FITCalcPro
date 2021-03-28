@@ -10,6 +10,19 @@ import math_lib
 def eval(members, operations):
     i = 0
     while i < len(operations):
+        if operations[i] == "power":
+            members[i] = math_lib.power(members[i], members[i + 1])
+            del members[i + 1]
+            del operations[i]
+        elif operations[i] == "root":
+            members[i] = math_lib.nth_root(members[i + 1], members[i])
+            del members[i + 1]
+            del operations[i]
+        else:
+            i = i + 1
+
+    i = 0
+    while i < len(operations):
         if operations[i] == "*":
             members[i] = math_lib.multiply(members[i], members[i + 1])
             del members[i + 1]
