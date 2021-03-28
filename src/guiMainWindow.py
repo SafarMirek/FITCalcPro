@@ -1,44 +1,78 @@
+##
+# @file guiMainWindow.py
+# @brief Hlavní okno s metodami pro vizualizaci uživatelských akcí
+# @author Matěj Mudra <xmudra04.stud.fit.vutbr.cz>
+#
+# * Project: fit-ivs-2
+# * Date created: 2021-03-04
+# * Last modified: 20201-03-21
+#
+
 # -*- coding: utf-8 -*-
 
 ################################################################################
 ## Form generated from reading UI file 'guiDesign.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.0.1
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
-
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from math_lib import *
 
 
+##
+# @brief Třída s rozložením kalkulačky
+#
 class Ui_mainWindow(object):
     def __init__(self):
         self.a_label = ""
         self.b_label = ""
+        self.option = ""
+        self.fnc_is_last = False
+        self.num_is_ready = False
+        self.operation_needed = False
 
+    ##
+    # @brief Přidá číslo do skece vstupů
+    # @param text Text, který bude přidán do sekce vstupů
+    # @param purge Přepínač, který za vymaže obsah sekce vstupů
+    #
     def add_number(self, text, purge):
+        if self.operation_needed:
+            return
+
         if purge:
             self.a_label = ""
+            self.num_is_ready = True
             self.action_label.setText(
-                QCoreApplication.translate("mainWindow", self.action_label, None))
+                QCoreApplication.translate("mainWindow", self.a_label, None))
         else:
             self.a_label += f"{text}"
+            self.num_is_ready = True
             self.action_label.setText(
                 QCoreApplication.translate("mainWindow", self.a_label, None))
 
+    ##
+    # @brief Přidá číslo do zásobníku vstupů
+    # @param text Text, který bude přidán do zásobníku vstupů
+    # @param purge Přepínač, který za vymaže obsah zásobníku vstupů
+    #
     def move_to_buffer(self, text, purge):
-        self.add_number("", True)
         if purge:
-            self.b_label = ""
+            self.b_label = u""
             self.buffer_label.setText(QCoreApplication.translate("mainWindow", self.b_label, None))
+            self.add_number("", True)
         else:
             self.b_label += f"{text}"
             self.buffer_label.setText(QCoreApplication.translate("mainWindow", self.b_label, None))
+            self.add_number("", True)
 
-    def convert_to_superscript(self, text):
+    ##
+    # @brief Převádí zadaný text na horní index
+    # @param char Charakter, který bude převeden na horní index
+    #
+    def convert_to_superscript(self, char):
         sup_chars = {
             0: u'\u2070',
             1: u'\xb9',
@@ -49,19 +83,134 @@ class Ui_mainWindow(object):
             6: u'\u2076',
             7: u'\u2077',
             8: u'\u2078',
-            9: u'\u2079'}
-        return sup_chars[text]
+            9: u'\u2079',
+            "pi": u"\u2DEB"}
+        if char != "pi":
+            return sup_chars[int(char)]
+        else:
+            return sup_chars[char]
 
+    ##
+    # @brief Převede libovolně dlouhý string na horní index
+    # @param text Text, který bude převeden na horní index
+    #
+    def string_to_superscript(self, string):
+        output = ""
+        for char in string:
+            output += f"{self.convert_to_superscript(char)}"
+        return output
+
+    ##
+    # @brief Funkce vyvolaná stisknutím tlačítka
+    # @param text Text, který bude předán do
+    #
     def number_button_press(self, text, is_superscript):
+        if text == "," and "," in self.a_label:
+            return
+        elif self.a_label == "" and text == ",":
+            return
+
         if is_superscript:
             self.add_number(self.convert_to_superscript(text), False)
         else:
             self.add_number(text, False)
+        self.fnc_is_last = False
 
-    def function_button_press(self, text):
-        self.move_to_buffer(text, False)
-        # pokud je zde "=", tak se zavolá výpočet
+    ##
+    # @brief Vyčistí a resetuje o všechny parametry kalkulačky do startovací hodnoty
+    #
+    def clear_all(self):
+        self.ac.clicked.connect(lambda: self.delete_char(True))
+        self.ac.clicked.connect(lambda: self.move_to_buffer("", True))
+        self.fnc_is_last = False
+        self.num_is_ready = False
+        self.operation_needed = False
 
+    ##
+    # @brief Funkce vyvolaná stisknutím tlačítka
+    # @param text Text, který bude předán do
+    # @param button Tlačítko jehož akce se provede
+    #
+    def function_button_press(self, text, button):
+        if len(self.a_label) > 1:
+            if self.a_label[-1] == ",":
+                return
+
+        if self.option == "yrootx":
+            self.b_label = self.b_label[:-1]
+            self.option = ""
+        elif self.option == "xpowery":
+            self.b_label = self.b_label[:-2]
+            text = self.string_to_superscript(text)
+            self.option = ""
+
+        if self.fnc_is_last:
+            return
+
+        if self.a_label == "" and self.operation_needed == False:
+            return
+
+        if button == "sin" and self.num_is_ready:
+            self.move_to_buffer("sin(" + text + ") ", False)
+            self.num_is_ready = False
+            self.operation_needed = True
+        elif button == "cos" and self.num_is_ready:
+            self.move_to_buffer("cos(" + text + ") ", False)
+            self.num_is_ready = False
+            self.operation_needed = True
+        elif button == "tan" and self.num_is_ready:
+            self.move_to_buffer("tan(" + text + ") ", False)
+            self.num_is_ready = False
+            self.operation_needed = True
+        elif button == "invert" and self.num_is_ready:
+            if text != "":
+                self.move_to_buffer(int(text) * (-1), False)
+            self.num_is_ready = False
+            self.operation_needed = True
+        elif button == "plus":
+            self.fnc_is_last = True
+            self.operation_needed = False
+            self.move_to_buffer(text + " + ", False)
+        elif button == "minus":
+            self.fnc_is_last = True
+            self.operation_needed = False
+            self.move_to_buffer(text + " - ", False)
+        elif button == "times":
+            self.fnc_is_last = True
+            self.operation_needed = False
+            self.move_to_buffer(text + u" \u00B7 ", False)
+        elif button == "devide":
+            self.fnc_is_last = True
+            self.operation_needed = False
+            self.move_to_buffer(text + " / ", False)
+        elif button == "factorial" and self.num_is_ready:
+            self.move_to_buffer(text + u"! ", False)
+        elif button == "twopowerx" and self.num_is_ready:
+            self.move_to_buffer(text + self.convert_to_superscript(2) + " ", False)
+            self.num_is_ready = False
+            self.operation_needed = False
+        elif button == "tworootx" and self.num_is_ready:
+            self.move_to_buffer(u"\u00b2\u221a" + text + " ", False)
+            self.num_is_ready = False
+            self.operation_needed = False
+        elif button == "yrootx" and self.num_is_ready:
+            self.option = "yrootx"
+            self.move_to_buffer(self.string_to_superscript(text) + u"\u221a\u25a1", False)
+            self.num_is_ready = False
+        elif button == "xpowery" and self.num_is_ready:
+            self.option = "xpowery"
+            self.move_to_buffer(text + u"^\u25a1", False)
+            self.num_is_ready = False
+        elif button == "equals":
+            self.move_to_buffer(text, False)
+            self.add_number("Vypocitano", False)
+            self.num_is_ready = False
+            self.operation_needed = False
+
+    ##
+    # @brief Odstraní charakter, nebo celý (action_label) spodní štítek
+    # @param delete_all Pokud je nastaveno na True vymaže celý spodní štítek, jinak jen jeden charakter
+    #
     def delete_char(self, delete_all):
         if delete_all:
             self.a_label = ""
@@ -70,6 +219,9 @@ class Ui_mainWindow(object):
             self.a_label = self.a_label[:-1]
             self.action_label.setText(QCoreApplication.translate("mainWindow", self.a_label, None))
 
+    ##
+    # @brief Inicializuje rozložení aplikace
+    #
     def setupUi(self, mainWindow):
         if not mainWindow.objectName():
             mainWindow.setObjectName(u"mainWindow")
@@ -115,7 +267,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.xpowery.setFlat(True)
-        self.xpowery.clicked.connect(lambda: power(2,2))
+        self.xpowery.clicked.connect(lambda: self.function_button_press(self.a_label, "xpowery"))
 
         self.gridLayout.addWidget(self.xpowery, 0, 0, 1, 1)
 
@@ -143,6 +295,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.yrootx.setFlat(True)
+        self.yrootx.clicked.connect(lambda: self.function_button_press(self.a_label, "yrootx"))
 
         self.gridLayout.addWidget(self.yrootx, 0, 1, 1, 1)
 
@@ -170,6 +323,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.twopowerx.setFlat(True)
+        self.twopowerx.clicked.connect(lambda: self.function_button_press(self.a_label, "twopowerx"))
 
         self.gridLayout.addWidget(self.twopowerx, 0, 2, 1, 1)
 
@@ -197,6 +351,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.tworootx.setFlat(True)
+        self.tworootx.clicked.connect(lambda: self.function_button_press(self.a_label, "tworootx"))
 
         self.gridLayout.addWidget(self.tworootx, 0, 3, 1, 1)
 
@@ -224,6 +379,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.factorial.setFlat(True)
+        self.factorial.clicked.connect(lambda: self.function_button_press(self.a_label, "factorial"))
 
         self.gridLayout.addWidget(self.factorial, 0, 4, 1, 1)
 
@@ -251,6 +407,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.invertor.setFlat(True)
+        self.invertor.clicked.connect(lambda: self.function_button_press(self.a_label, "invert"))
 
         self.gridLayout.addWidget(self.invertor, 1, 0, 1, 1)
 
@@ -278,6 +435,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.sin.setFlat(True)
+        self.sin.clicked.connect(lambda: self.function_button_press(self.a_label, "sin"))
 
         self.gridLayout.addWidget(self.sin, 1, 1, 1, 1)
 
@@ -305,6 +463,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.cos.setFlat(True)
+        self.cos.clicked.connect(lambda: self.function_button_press(self.a_label, "cos"))
 
         self.gridLayout.addWidget(self.cos, 1, 2, 1, 1)
 
@@ -332,6 +491,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.tan.setFlat(True)
+        self.tan.clicked.connect(lambda: self.function_button_press(self.a_label, "tan"))
 
         self.gridLayout.addWidget(self.tan, 1, 3, 1, 1)
 
@@ -359,6 +519,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.pi.setFlat(True)
+        self.pi.clicked.connect(lambda: self.number_button_press(u"\u03c0", False))
 
         self.gridLayout.addWidget(self.pi, 1, 4, 1, 1)
 
@@ -470,7 +631,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.ac.setFlat(True)
-        self.ac.clicked.connect(lambda: self.delete_char(True))
+        self.ac.clicked.connect(lambda: self.clear_all())
 
         self.gridLayout.addWidget(self.ac, 2, 3, 1, 1)
 
@@ -526,6 +687,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.four.setFlat(True)
+        self.four.clicked.connect(lambda: self.number_button_press(u"4", False))
 
         self.gridLayout.addWidget(self.four, 3, 0, 1, 1)
 
@@ -609,6 +771,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.times.setFlat(True)
+        self.times.clicked.connect(lambda: self.function_button_press(self.a_label, "times"))
 
         self.gridLayout.addWidget(self.times, 3, 3, 1, 1)
 
@@ -636,6 +799,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.devide.setFlat(True)
+        self.devide.clicked.connect(lambda: self.function_button_press(self.a_label, "devide"))
 
         self.gridLayout.addWidget(self.devide, 3, 4, 1, 1)
 
@@ -747,6 +911,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.plus.setFlat(True)
+        self.plus.clicked.connect(lambda: self.function_button_press(self.a_label, "plus"))
 
         self.gridLayout.addWidget(self.plus, 4, 3, 1, 1)
 
@@ -774,6 +939,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.minus.setFlat(True)
+        self.minus.clicked.connect(lambda: self.function_button_press(self.a_label, "minus"))
 
         self.gridLayout.addWidget(self.minus, 4, 4, 1, 1)
 
@@ -884,6 +1050,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.equals.setFlat(True)
+        self.equals.clicked.connect(lambda: self.function_button_press(self.a_label, "equals"))
 
         self.gridLayout.addWidget(self.equals, 5, 3, 1, 1)
 
@@ -928,8 +1095,8 @@ class Ui_mainWindow(object):
         self.buffer_label.setFont(font1)
         self.buffer_label.setLayoutDirection(Qt.LeftToRight)
         self.buffer_label.setStyleSheet(u"QLabel {\n"
-"	color: rgb(255,255,255)\n"
-"}")
+        "	color: rgb(255,255,255)\n"
+        "}")
         self.buffer_label.setTextFormat(Qt.RichText)
         self.buffer_label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.buffer_label.setMargin(15)
@@ -942,8 +1109,8 @@ class Ui_mainWindow(object):
         self.action_label.setFont(font)
         self.action_label.setLayoutDirection(Qt.LeftToRight)
         self.action_label.setStyleSheet(u"QLabel {\n"
-"	color: rgb(255,255,255)\n"
-"}")
+        "	color: rgb(255,255,255)\n"
+        "}")
         self.action_label.setTextFormat(Qt.RichText)
         self.action_label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.action_label.setMargin(15)
@@ -957,8 +1124,8 @@ class Ui_mainWindow(object):
         self.menuasd = QMenu(self.menubar)
         self.menuasd.setObjectName(u"menuasd")
         self.menuasd.setStyleSheet(u"QMenu {\n"
-"	color: rgb(255,255,255);\n"
-"}")
+        "	color: rgb(0,0,0);\n"
+        "}")
         mainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(mainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -971,8 +1138,10 @@ class Ui_mainWindow(object):
         self.xpowery.setDefault(False)
 
         QMetaObject.connectSlotsByName(mainWindow)
-    # setupUi
 
+    ##
+    # @brief Nastaví texty elementů aplikace
+    #
     def retranslateUi(self, mainWindow):
         mainWindow.setWindowTitle(QCoreApplication.translate("mainWindow", u"FitCalcPro", None))
         self.xpowery.setText(QCoreApplication.translate("mainWindow", u"x\u02b8", None))
@@ -1005,7 +1174,6 @@ class Ui_mainWindow(object):
         self.Ans.setText(QCoreApplication.translate("mainWindow", u"Ans", None))
         self.equals.setText(QCoreApplication.translate("mainWindow", u"=", None))
         self.guide.setText(QCoreApplication.translate("mainWindow", u"???", None))
-        self.buffer_label.setText(QCoreApplication.translate("mainWindow", u"TextLabel", None))
+        self.buffer_label.setText(QCoreApplication.translate("mainWindow", u"", None))
         self.action_label.setText(QCoreApplication.translate("mainWindow", u"Zadejte p\u0159\u00edklad", None))
-        self.menuasd.setTitle(QCoreApplication.translate("mainWindow", u"N\u00e1pov\u011bda", None))
-    # retranslateUi
+        self.menuasd.setTitle(QCoreApplication.translate("mainWindow", u"Dokumentace", None))
