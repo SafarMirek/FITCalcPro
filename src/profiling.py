@@ -23,9 +23,9 @@ if __name__ == '__main__':
     for line in content:
         for i in line:
             if i.isdigit():
-                sigma += int(i)
-                sigma_pow_2 += power(int(i), 2)
-                n += 1
+                sigma = sum(sigma, int(i))
+                sigma_pow_2 = sum(power(int(i), 2), sigma_pow_2)
+                n = sum(n, 1)
 
     x = divide(sigma, n)
     s = nth_root(multiply(divide(1, sub(n, 1)), sub(sigma_pow_2, multiply(n, power(x, 2)))), 2)
