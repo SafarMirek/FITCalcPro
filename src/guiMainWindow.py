@@ -23,6 +23,7 @@ from ButtonActions import *
 from math_interpreter import *
 from math_lib import *
 
+regular_pi = "\u03c0"
 
 ##
 # @brief Třída s rozložením kalkulačky
@@ -46,7 +47,7 @@ class Ui_mainWindow(object):
             ButtonAction("factorial", "{value}! ", lambda a: factorial(a), True),
             ButtonAction("plus", "{value} + ", "+", False),
             ButtonAction("minus", "{value} - ", "-", False),
-            ButtonAction("times", "{value} * ", "*", False),
+            ButtonAction("times", "{value} \u00B7 ", "*", False),
             ButtonAction("devide", "{value} / ", "/", False),
             ButtonAction("twopowerx", "{value}" + f"{self.convert_to_superscript(2)}", lambda a: power(a, 2), True),
             ButtonAction("tworootx", f"{self.convert_to_superscript(2)}\u221a" + "{value} ", lambda a: nth_root(a, 2), True),
@@ -106,10 +107,10 @@ class Ui_mainWindow(object):
             8: u'\u2078',
             9: u'\u2079',
             "pi": u"\u2DEB"}
-        if char != "pi":
+        if char != regular_pi:
             return sup_chars[int(char)]
         else:
-            return sup_chars[char]
+            return sup_chars["pi"]
 
     ##
     # @brief Převede libovolně dlouhý string na horní index
@@ -185,6 +186,8 @@ class Ui_mainWindow(object):
         if not self.operation_needed:
             if "," in text:
                 self.members.append(float(text.replace(",", ".")))
+            elif text == regular_pi:
+                self.members.append(float(pi))
             else:
                 self.members.append(int(text))
 
@@ -257,6 +260,8 @@ class Ui_mainWindow(object):
         if delete_all:
             self.a_label = ""
             self.action_label.setText(QCoreApplication.translate("mainWindow", self.a_label, None))
+        elif self.calc_done:
+            self.clear_all()
         else:
             self.a_label = self.a_label[:-1]
             self.action_label.setText(QCoreApplication.translate("mainWindow", self.a_label, None))
@@ -278,7 +283,7 @@ class Ui_mainWindow(object):
             self.ans = int(self.ans)
             self.add_number(self.ans, False)
         else:
-            self.ans = float(self.ans)
+            self.ans = round(float(self.ans), accuracy)
             self.add_number(f"{self.ans}".replace(".", ","), False)
 
         self.calc_done = True
