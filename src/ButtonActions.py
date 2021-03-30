@@ -11,11 +11,18 @@ class ButtonAction:
 
 
 class RootButtonAction(ButtonAction):
-    def __init__(self, name, format_text, operation, tosuperscript_fce):
-        super().__init__(name, format_text, operation, False)
-        self.tosuperscript_fce = tosuperscript_fce
+    def __init__(self, name, format_text, operation, to_superscript_fce):
+        super().__init__(name, format_text, operation, instant=False)
+        self.to_superscript_fce = to_superscript_fce
 
     def get_formatted(self, text):
-        return self.tosuperscript_fce(text) + u"\u221a\u25a1"
+        return self.to_superscript_fce(text) + u"\u221a\u25a1"
 
 
+class PowerButtonAction(ButtonAction):
+    def __init__(self, name, format_text, operation, to_superscript_fce):
+        super().__init__(name, format_text, operation, instant=False)
+        self.to_superscript_fce = to_superscript_fce
+
+    def get_formatted(self, text):
+        return self.to_superscript_fce(text) + u"\u25a1"

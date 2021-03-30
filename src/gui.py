@@ -4,8 +4,11 @@
 # Datum: 4.3.2021
 
 import sys
+
 from PySide6.QtWidgets import QApplication, QMainWindow
+
 from guiMainWindow import Ui_mainWindow
+
 
 ##
 # @brief Inicializuje rozložení aplikace
@@ -45,7 +48,7 @@ class MainWindow(QMainWindow):
         elif event.text() == "+":
             self.ui.function_button_press(self.ui.a_label, "plus")
         elif event.text() == "-":
-            self.ui.function_button_press(self.ui.a_label, "minus")
+            self.ui.decide_minus()
         elif event.text() == "*":
             self.ui.function_button_press(self.ui.a_label, "times")
         elif event.text() == "/":
@@ -66,7 +69,6 @@ class MainWindow(QMainWindow):
             self.ui.function_button_press(self.ui.a_label, "factorial")
         elif event.key() == 16777223:
             self.ui.clear_all()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

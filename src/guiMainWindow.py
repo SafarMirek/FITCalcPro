@@ -18,9 +18,10 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-from math_lib import *
-from math_interpreter import *
+
 from ButtonActions import *
+from math_interpreter import *
+from math_lib import *
 
 
 ##
@@ -30,10 +31,11 @@ class Ui_mainWindow(object):
     def __init__(self):
         self.a_label = ""
         self.b_label = ""
-        self.option = ""
-        self.fnc_is_last = False
+        self.ans = 0
         self.num_is_ready = False
         self.operation_needed = False
+        self.remove_square = False
+        self.calc_done = False
         self.members = []
         self.operations = []
         self.buttonActions = [
@@ -41,14 +43,15 @@ class Ui_mainWindow(object):
             ButtonAction("cos", "cos({value}) ", lambda a: cos(a), True),
             ButtonAction("tan", "tan({value}) ", lambda a: tan(a), True),
             ButtonAction("factorial", "{value}! ", lambda a: factorial(a), True),
-            ButtonAction("twopowerx", "{value}! ", lambda a: power(a, 2), True),
-            ButtonAction("tworootx", "{value}! ", lambda a: nth_root(a, 2), True),
+            ButtonAction("twopowerx", "{value}" + f"{self.convert_to_superscript(2)}", lambda a: power(a, 2), False),
+            ButtonAction("tworootx", f"{self.convert_to_superscript(2)}\u221a" + "{value} ", lambda a: nth_root(a, 2), False),
             ButtonAction("plus", "{value} + ", "+", False),
             ButtonAction("minus", "{value} - ", "-", False),
             ButtonAction("times", "{value} * ", "*", False),
             ButtonAction("devide", "{value} / ", "/", False),
-            ButtonAction("xpowery", "{value} ^ ", "power", False),
-            RootButtonAction("yrootx", "not_used", "root", lambda a: self.string_to_superscript(a)),
+            # Add fnc for unicode prettifying
+            ButtonAction("xpowery", "{value}^\u25a1", "power", lambda a: self.string_to_superscript(a)),
+            RootButtonAction("yrootx", "{value}\u221a\u25a1", "root", lambda a: self.string_to_superscript(a)),
         ]
 
     ##
@@ -62,14 +65,14 @@ class Ui_mainWindow(object):
 
         if purge:
             self.a_label = ""
-            self.num_is_ready = True
-            self.action_label.setText(
-                QCoreApplication.translate("mainWindow", self.a_label, None))
+            self.num_is_ready = False
         else:
             self.a_label += f"{text}"
-            self.num_is_ready = True
-            self.action_label.setText(
-                QCoreApplication.translate("mainWindow", self.a_label, None))
+            if text != "," or text != "-":
+                self.num_is_ready = True
+
+        self.action_label.setText(
+            QCoreApplication.translate("mainWindow", self.a_label, None))
 
     ##
     # @brief Přidá číslo do zásobníku vstupů
@@ -79,11 +82,10 @@ class Ui_mainWindow(object):
     def move_to_buffer(self, text, purge):
         if purge:
             self.b_label = u""
-            self.buffer_label.setText(QCoreApplication.translate("mainWindow", self.b_label, None))
-            self.add_number("", True)
         else:
             self.b_label += f"{text}"
-            self.buffer_label.setText(QCoreApplication.translate("mainWindow", self.b_label, None))
+        self.buffer_label.setText(QCoreApplication.translate("mainWindow", self.b_label, None))
+        if not self.calc_done:
             self.add_number("", True)
 
     ##
@@ -123,24 +125,23 @@ class Ui_mainWindow(object):
     # @param text Text, který bude předán do
     #
     def number_button_press(self, text, is_superscript):
+        if self.calc_done:
+            self.clear_all()
+            self.calc_done = False
+
         if text == "," and "," in self.a_label:
             return
         elif self.a_label == "" and text == ",":
             return
 
-        if is_superscript:
-            self.add_number(self.convert_to_superscript(text), False)
-        else:
-            self.add_number(text, False)
-        self.fnc_is_last = False
+        self.add_number(text, False)
 
     ##
     # @brief Vyčistí a resetuje o všechny parametry kalkulačky do startovací hodnoty
     #
     def clear_all(self):
-        self.ac.clicked.connect(lambda: self.delete_char(True))
-        self.ac.clicked.connect(lambda: self.move_to_buffer("", True))
-        self.fnc_is_last = False
+        self.delete_char(True)
+        self.move_to_buffer("", True)
         self.num_is_ready = False
         self.operation_needed = False
         self.operations = []
@@ -152,51 +153,82 @@ class Ui_mainWindow(object):
     # @param button Tlačítko jehož akce se provede
     #
     def function_button_press(self, text, button):
-        if len(self.a_label) > 1:
-            if self.a_label[-1] == ",":
-                return
-
-        if self.option == "yrootx":
-            self.b_label = self.b_label[:-1]
-            self.option = ""
-        elif self.option == "xpowery":
-            self.b_label = self.b_label[:-2]
-            text = self.string_to_superscript(text)
-            self.option = ""
-
-        if self.fnc_is_last:
-            return
-
-        if self.a_label == "" and self.operation_needed == False:
+        if not self.ready_for_function():
             return
 
         # TODO: Invert function
 
         for buttonAction in self.buttonActions:
             if buttonAction.name == button:
-                if "," in text:
-                    self.members.append(float(text))
-                else:
-                    self.members.append(int(text))
+                if not self.operation_needed:
+                    if "," in text:
+                        self.members.append(float(text))
+                    else:
+                        self.members.append(int(text))
+
                 self.num_is_ready = False
                 self.add_number("", True)
+                self.make_append(buttonAction)
+                if len(self.operations) > 1:
+                    if self.operations[-2] == "power":
+                        text = self.string_to_superscript(text)
                 self.move_to_buffer(buttonAction.get_formatted(text), False)
 
-                if buttonAction.instant:
-                    x = self.members.pop()
-                    self.members.append(buttonAction.operation(x))
-                else:
-                    self.operations.append(buttonAction.operation)
-
-        self.operation_needed = len(self.members) == len(self.operations) + 1
+        if button != "xpowery" and button != "yrootx":
+            self.operation_needed = len(self.members) == len(self.operations) + 1
+        else:
+            self.operation_needed = False
 
         if button == "equals":
-            self.move_to_buffer(text, False)
-            if text != "":
-                self.members.append(float(text))
-            self.num_is_ready = False
-            self.operation_needed = False
-            self.add_number(eval(self.members, self.operations), False)
+            self.calc_and_print(text)
+
+    ##
+    # @brief
+    # @param action
+    #
+    def make_append(self, action):
+        if action.instant and action.operation != "power" and action.operation != "root":
+            x = self.members.pop()
+            self.members.append(action.operation(x))
+        elif action.operation == "power" or action.operation == "root":
+            self.remove_square = True
+            self.operations.append(action.operation)
+        else:
+            self.reformat_exponents(False)
+            self.operations.append(action.operation)
+
+    ##
+    # @brief Kontroluje jestli stav programu umožňuje aby byla funkce dále zpracovávána
+    #
+    def ready_for_function(self):
+        if len(self.a_label) > 1:
+            if self.a_label[-1] == ",":
+                return False
+        elif self.a_label == "":
+            return False
+
+        if self.calc_done and float(self.a_label) == float(self.ans):
+            self.calc_done = False
+            self.move_to_buffer("", True)
+            del self.members[0]
+        return True
+
+    ##
+    # @brief Odstraní pomocný čtverec z mocniné a odmocniné funkce
+    # @param text Text k reformátování
+    #
+    def reformat_exponents(self, text):
+        if self.remove_square and not text:
+            if "^" in self.b_label:
+                self.b_label = self.b_label[:-2]
+            elif "\u221a" in self.b_label:
+                self.b_label = self.b_label[:-1]
+        else:
+            if "^" in self.b_label:
+                self.b_label = self.b_label.replace("^\u25a1" + text, self.string_to_superscript(text))
+            elif "\u221a" in self.b_label:
+                self.b_label = self.b_label.replace("\u25a1", "")
+            self.move_to_buffer("", False)
 
     ##
     # @brief Odstraní charakter, nebo celý (action_label) spodní štítek
@@ -210,6 +242,40 @@ class Ui_mainWindow(object):
             self.a_label = self.a_label[:-1]
             self.action_label.setText(QCoreApplication.translate("mainWindow", self.a_label, None))
 
+    ##
+    # @brief Přidá do zásobníku zbylou hodnotu a vytiskne číslo dle jeho typu
+    # @param text Hodnota z pole vstupů
+    #
+    def calc_and_print(self, text):
+        self.move_to_buffer(text, False)
+        if text != "":
+            self.append_type(text)
+            if self.remove_square:
+                self.reformat_exponents(text)
+        self.num_is_ready = False
+        self.operation_needed = False
+        self.ans = float(eval(self.members, self.operations))
+        if f"{self.ans}".rpartition('.')[2] == "0":
+            self.ans = int(self.ans)
+            self.add_number(self.ans, False)
+        else:
+            self.ans = float(self.ans)
+            self.add_number(f"{self.ans}".replace(".", ","), False)
+        self.calc_done = True
+
+    ##
+    # @brief Přidá do zásobníku čísel číslo ve správném typu
+    # @param text Text k převedení
+    #
+    def append_type(self, text):
+        if "," in text:
+            self.members.append(float(text))
+        else:
+            self.members.append(int(text))
+
+    ##
+    # @brief Rozhodne zda se mínus bude chovat jako znaménko, nebo operace
+    #
     def decide_minus(self):
         if self.a_label == "":
             self.number_button_press(u"-", False)
@@ -936,7 +1002,6 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.minus.setFlat(True)
-
         self.minus.clicked.connect(lambda: self.decide_minus())
 
         self.gridLayout.addWidget(self.minus, 4, 4, 1, 1)
@@ -1021,6 +1086,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.Ans.setFlat(True)
+        self.Ans.clicked.connect(lambda: self.number_button_press(f"{self.ans}", False))
 
         self.gridLayout.addWidget(self.Ans, 5, 2, 1, 1)
 
