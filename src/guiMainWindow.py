@@ -29,27 +29,28 @@ from math_lib import *
 #
 class Ui_mainWindow(object):
     def __init__(self):
+        self.ans = 0
         self.a_label = ""
         self.b_label = ""
-        self.ans = 0
-        self.num_is_ready = False
-        self.operation_needed = False
-        self.remove_square = False
-        self.calc_done = False
         self.members = []
         self.operations = []
+        self.calc_done = False
+        self.num_is_ready = False
+        self.remove_square = False
+        self.operation_needed = False
+        self.instant_in_buffer = False
         self.buttonActions = [
             ButtonAction("sin", "sin({value}) ", lambda a: sin(a), True),
             ButtonAction("cos", "cos({value}) ", lambda a: cos(a), True),
             ButtonAction("tan", "tan({value}) ", lambda a: tan(a), True),
             ButtonAction("factorial", "{value}! ", lambda a: factorial(a), True),
-            ButtonAction("twopowerx", "{value}" + f"{self.convert_to_superscript(2)}", lambda a: power(a, 2), False),
-            ButtonAction("tworootx", f"{self.convert_to_superscript(2)}\u221a" + "{value} ", lambda a: nth_root(a, 2), False),
             ButtonAction("plus", "{value} + ", "+", False),
             ButtonAction("minus", "{value} - ", "-", False),
             ButtonAction("times", "{value} * ", "*", False),
             ButtonAction("devide", "{value} / ", "/", False),
-            # Add fnc for unicode prettifying
+            ButtonAction("twopowerx", "{value}" + f"{self.convert_to_superscript(2)}", lambda a: power(a, 2), True),
+            ButtonAction("tworootx", f"{self.convert_to_superscript(2)}\u221a" + "{value} ", lambda a: nth_root(a, 2), True),
+            #ButtonAction("invert", "{value}", lambda a: a*(-1), True),
             ButtonAction("xpowery", "{value}^\u25a1", "power", lambda a: self.string_to_superscript(a)),
             RootButtonAction("yrootx", "{value}\u221a\u25a1", "root", lambda a: self.string_to_superscript(a)),
         ]
@@ -144,6 +145,7 @@ class Ui_mainWindow(object):
         self.move_to_buffer("", True)
         self.num_is_ready = False
         self.operation_needed = False
+        self.instant_in_buffer = False
         self.operations = []
         self.members = []
 
@@ -153,26 +155,18 @@ class Ui_mainWindow(object):
     # @param button Tlačítko jehož akce se provede
     #
     def function_button_press(self, text, button):
-        if not self.ready_for_function():
+        if not self.ready_for_function(button):
             return
 
         # TODO: Invert function
 
         for buttonAction in self.buttonActions:
             if buttonAction.name == button:
-                if not self.operation_needed:
-                    if "," in text:
-                        self.members.append(float(text))
-                    else:
-                        self.members.append(int(text))
-
-                self.num_is_ready = False
-                self.add_number("", True)
-                self.make_append(buttonAction)
-                if len(self.operations) > 1:
-                    if self.operations[-2] == "power":
-                        text = self.string_to_superscript(text)
-                self.move_to_buffer(buttonAction.get_formatted(text), False)
+                self.process_action(text, buttonAction)
+                if buttonAction.instant:
+                    self.instant_in_buffer = True
+                else:
+                    self.instant_in_buffer = False
 
         if button != "xpowery" and button != "yrootx":
             self.operation_needed = len(self.members) == len(self.operations) + 1
@@ -183,8 +177,28 @@ class Ui_mainWindow(object):
             self.calc_and_print(text)
 
     ##
-    # @brief
-    # @param action
+    # @brief Zpracuje zadanou funkci
+    # @param text Text z uživatelského vstupu
+    # @param button_action Aḱce, která se má zpracovat
+    #
+    def process_action(self, text, button_action):
+        if not self.operation_needed:
+            if "," in text:
+                self.members.append(float(text.replace(",", ".")))
+            else:
+                self.members.append(int(text))
+
+        self.num_is_ready = False
+        self.add_number("", True)
+        self.make_append(button_action)
+        if len(self.operations) > 1:
+            if self.operations[-2] == "power":
+                text = self.string_to_superscript(text)
+        self.move_to_buffer(button_action.get_formatted(text), False)
+
+    ##
+    # @brief Vloží operaci a číslo na zásobník, provede instantní akce a zaznačí jestli odstranit pomocný čtverec
+    # @param action Akce, která se má provést
     #
     def make_append(self, action):
         if action.instant and action.operation != "power" and action.operation != "root":
@@ -200,17 +214,22 @@ class Ui_mainWindow(object):
     ##
     # @brief Kontroluje jestli stav programu umožňuje aby byla funkce dále zpracovávána
     #
-    def ready_for_function(self):
+    def ready_for_function(self, button):
         if len(self.a_label) > 1:
             if self.a_label[-1] == ",":
                 return False
-        elif self.a_label == "":
+        elif self.a_label == "" and not self.instant_in_buffer:
             return False
 
-        if self.calc_done and float(self.a_label) == float(self.ans):
+        if len(self.b_label) > 1:
+            if self.b_label[-1] == self.convert_to_superscript(2) and button == "tworootx" or button == "twopowerx":
+                return False
+
+        if self.calc_done and float(self.a_label.replace(",", ".")) == float(self.ans):
             self.calc_done = False
             self.move_to_buffer("", True)
             del self.members[0]
+
         return True
 
     ##
@@ -261,6 +280,7 @@ class Ui_mainWindow(object):
         else:
             self.ans = float(self.ans)
             self.add_number(f"{self.ans}".replace(".", ","), False)
+
         self.calc_done = True
 
     ##
@@ -269,7 +289,7 @@ class Ui_mainWindow(object):
     #
     def append_type(self, text):
         if "," in text:
-            self.members.append(float(text))
+            self.members.append(float(text.replace(",", ".")))
         else:
             self.members.append(int(text))
 
