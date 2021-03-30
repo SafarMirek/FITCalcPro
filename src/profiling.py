@@ -30,3 +30,4 @@ if __name__ == '__main__':
     x = divide(sigma, n)
     s = nth_root(multiply(divide(1, sub(n, 1)), sub(sigma_pow_2, multiply(n, power(x, 2)))), 2)
 
+    print(s)
