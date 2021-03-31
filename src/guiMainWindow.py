@@ -65,6 +65,9 @@ class Ui_mainWindow(object):
         if self.operation_needed:
             return
 
+        if self.a_label == regular_pi and not purge:
+            return
+
         if purge:
             self.a_label = ""
             self.num_is_ready = False
@@ -96,21 +99,30 @@ class Ui_mainWindow(object):
     #
     def convert_to_superscript(self, char):
         sup_chars = {
-            0: u'\u2070',
-            1: u'\xb9',
-            2: u'\xb2',
-            3: u'\xb3',
-            4: u'\u2074',
-            5: u'\u2075',
-            6: u'\u2076',
-            7: u'\u2077',
-            8: u'\u2078',
-            9: u'\u2079',
-            "pi": u"\u2DEB"}
+            0:      u'\u2070',
+            1:      u'\xb9',
+            2:      u'\xb2',
+            3:      u'\xb3',
+            4:      u'\u2074',
+            5:      u'\u2075',
+            6:      u'\u2076',
+            7:      u'\u2077',
+            8:      u'\u2078',
+            9:      u'\u2079',
+            "pi":   u"\u2DEB",
+            "-":    u"\u207B",
+            #"t":    u"\u1D57",
+            #"o":    u"\u1D52",
+            #"a":    u"\u1D43",
+            #"c":    u"\u1D9C",
+            #"n":    u"\u207F",
+            #"i":    u"\u2071",
+            #"s":    u"\u02E2",
+            }
         if char != regular_pi:
             return sup_chars[int(char)]
-        else:
-            return sup_chars["pi"]
+        elif isinstance(char, str):
+            return sup_chars[char]
 
     ##
     # @brief Převede libovolně dlouhý string na horní index
@@ -126,7 +138,7 @@ class Ui_mainWindow(object):
     # @brief Funkce vyvolaná stisknutím tlačítka
     # @param text Text, který bude předán do
     #
-    def number_button_press(self, text, is_superscript):
+    def number_button_press(self, text):
         if self.calc_done:
             self.clear_all()
             self.calc_done = False
@@ -156,7 +168,7 @@ class Ui_mainWindow(object):
     # @param button Tlačítko jehož akce se provede
     #
     def function_button_press(self, text, button):
-        if not self.ready_for_function(button):
+        if not self.ready_for_function(button, text):
             return
 
         # TODO: Invert function
@@ -217,15 +229,23 @@ class Ui_mainWindow(object):
     ##
     # @brief Kontroluje jestli stav programu umožňuje aby byla funkce dále zpracovávána
     #
-    def ready_for_function(self, button):
+    def ready_for_function(self, button, text):
+        for i in range(0, 3):
+            if self.buttonActions[i].name == button and text == '':
+                return False
+
         if len(self.a_label) > 1:
             if self.a_label[-1] == ",":
+                return False
+            elif self.a_label[-2] == ')' and button == "xpowery":
                 return False
         elif self.a_label == "" and not self.instant_in_buffer:
             return False
 
         if len(self.b_label) > 1:
-            if self.b_label[-1] == self.convert_to_superscript(2) and button == "tworootx" or button == "twopowerx":
+            if self.b_label[-1] == self.convert_to_superscript(2) and (button == "tworootx" or button == "twopowerx"):
+                return False
+            elif self.b_label[-2] == ")" and (button == "yrootx"or button == 'tworootx'):
                 return False
 
         if self.calc_done and float(self.a_label.replace(",", ".")) == float(self.ans):
@@ -293,8 +313,10 @@ class Ui_mainWindow(object):
     # @param text Text k převedení
     #
     def append_type(self, text):
-        if "," in text:
+        if "," in text or "." in text: # and not regular_pi:
             self.members.append(float(text.replace(",", ".")))
+        elif regular_pi in text:
+            self.members.append(float(pi))
         else:
             self.members.append(int(text))
 
@@ -303,7 +325,7 @@ class Ui_mainWindow(object):
     #
     def decide_minus(self):
         if self.a_label == "":
-            self.number_button_press(u"-", False)
+            self.number_button_press(u"-")
         else:
             self.function_button_press(self.a_label, "minus")
 
@@ -314,7 +336,7 @@ class Ui_mainWindow(object):
         if not mainWindow.objectName():
             mainWindow.setObjectName(u"mainWindow")
         mainWindow.resize(400, 600)
-        mainWindow.setMaximumSize(QSize(400, 600))
+        mainWindow.setFixedSize(QSize(400, 600))
         mainWindow.setStyleSheet(u"background-color: rgb(40, 40, 40);")
         self.centralwidget = QWidget(mainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -607,7 +629,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.pi.setFlat(True)
-        self.pi.clicked.connect(lambda: self.number_button_press(u"\u03c0", False))
+        self.pi.clicked.connect(lambda: self.number_button_press(u"\u03c0"))
 
         self.gridLayout.addWidget(self.pi, 1, 4, 1, 1)
 
@@ -635,7 +657,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.seven.setFlat(True)
-        self.seven.clicked.connect(lambda: self.number_button_press(u"7", False))
+        self.seven.clicked.connect(lambda: self.number_button_press(u"7"))
 
         self.gridLayout.addWidget(self.seven, 2, 0, 1, 1)
 
@@ -663,7 +685,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.eight.setFlat(True)
-        self.eight.clicked.connect(lambda: self.number_button_press(u"8", False))
+        self.eight.clicked.connect(lambda: self.number_button_press(u"8"))
 
         self.gridLayout.addWidget(self.eight, 2, 1, 1, 1)
 
@@ -691,7 +713,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.nine.setFlat(True)
-        self.nine.clicked.connect(lambda: self.number_button_press(u"9", False))
+        self.nine.clicked.connect(lambda: self.number_button_press(u"9"))
 
         self.gridLayout.addWidget(self.nine, 2, 2, 1, 1)
 
@@ -775,7 +797,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.four.setFlat(True)
-        self.four.clicked.connect(lambda: self.number_button_press(u"4", False))
+        self.four.clicked.connect(lambda: self.number_button_press(u"4"))
 
         self.gridLayout.addWidget(self.four, 3, 0, 1, 1)
 
@@ -803,7 +825,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.five.setFlat(True)
-        self.five.clicked.connect(lambda: self.number_button_press(u"5", False))
+        self.five.clicked.connect(lambda: self.number_button_press(u"5"))
 
         self.gridLayout.addWidget(self.five, 3, 1, 1, 1)
 
@@ -831,7 +853,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.six.setFlat(True)
-        self.six.clicked.connect(lambda: self.number_button_press(u"6", False))
+        self.six.clicked.connect(lambda: self.number_button_press(u"6"))
 
         self.gridLayout.addWidget(self.six, 3, 2, 1, 1)
 
@@ -915,7 +937,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.one.setFlat(True)
-        self.one.clicked.connect(lambda: self.number_button_press(u"1", False))
+        self.one.clicked.connect(lambda: self.number_button_press(u"1"))
 
         self.gridLayout.addWidget(self.one, 4, 0, 1, 1)
 
@@ -943,7 +965,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.two.setFlat(True)
-        self.two.clicked.connect(lambda: self.number_button_press(u"2", False))
+        self.two.clicked.connect(lambda: self.number_button_press(u"2"))
 
         self.gridLayout.addWidget(self.two, 4, 1, 1, 1)
 
@@ -971,7 +993,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.three.setFlat(True)
-        self.three.clicked.connect(lambda: self.number_button_press(u"3", False))
+        self.three.clicked.connect(lambda: self.number_button_press(u"3"))
 
         self.gridLayout.addWidget(self.three, 4, 2, 1, 1)
 
@@ -1055,7 +1077,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.comma.setFlat(True)
-        self.comma.clicked.connect(lambda: self.number_button_press(u",", False))
+        self.comma.clicked.connect(lambda: self.number_button_press(u","))
 
         self.gridLayout.addWidget(self.comma, 5, 0, 1, 1)
 
@@ -1083,7 +1105,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.zero.setFlat(True)
-        self.zero.clicked.connect(lambda: self.number_button_press(u"0", False))
+        self.zero.clicked.connect(lambda: self.number_button_press(u"0"))
 
         self.gridLayout.addWidget(self.zero, 5, 1, 1, 1)
 
@@ -1111,7 +1133,7 @@ class Ui_mainWindow(object):
         "	color: rgb(30, 30, 30);\n"
         "}")
         self.Ans.setFlat(True)
-        self.Ans.clicked.connect(lambda: self.number_button_press(f"{self.ans}", False))
+        self.Ans.clicked.connect(lambda: self.number_button_press(f"{self.ans}".replace(".", ",")))
 
         self.gridLayout.addWidget(self.Ans, 5, 2, 1, 1)
 
