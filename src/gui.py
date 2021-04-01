@@ -5,7 +5,7 @@
 
 import sys
 
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide2.QtWidgets import QApplication, QMainWindow
 
 from guiMainWindow import Ui_mainWindow
 
@@ -24,27 +24,27 @@ class MainWindow(QMainWindow):
     #
     def keyPressEvent(self, event):
         if event.text() == "0":
-            self.ui.number_button_press(u"0", False)
+            self.ui.number_button_press(u"0")
         elif event.text() == "1":
-            self.ui.number_button_press(u"1", False)
+            self.ui.number_button_press(u"1")
         elif event.text() == "2":
-            self.ui.number_button_press(u"2", False)
+            self.ui.number_button_press(u"2")
         elif event.text() == "3":
-            self.ui.number_button_press(u"3", False)
+            self.ui.number_button_press(u"3")
         elif event.text() == "4":
-            self.ui.number_button_press(u"4", False)
+            self.ui.number_button_press(u"4")
         elif event.text() == "5":
-            self.ui.number_button_press(u"5", False)
+            self.ui.number_button_press(u"5")
         elif event.text() == "6":
-            self.ui.number_button_press(u"6", False)
+            self.ui.number_button_press(u"6")
         elif event.text() == "7":
-            self.ui.number_button_press(u"7", False)
+            self.ui.number_button_press(u"7")
         elif event.text() == "8":
-            self.ui.number_button_press(u"8", False)
+            self.ui.number_button_press(u"8")
         elif event.text() == "9":
-            self.ui.number_button_press(u"9", False)
+            self.ui.number_button_press(u"9")
         elif event.text() == "," or event.text() == ".":
-            self.ui.number_button_press(u",", False)
+            self.ui.number_button_press(u",")
         elif event.text() == "+":
             self.ui.function_button_press(self.ui.a_label, "plus")
         elif event.text() == "-":
@@ -69,6 +69,7 @@ class MainWindow(QMainWindow):
             self.ui.function_button_press(self.ui.a_label, "factorial")
         elif event.key() == 16777223:
             self.ui.clear_all()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
