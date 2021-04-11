@@ -53,7 +53,7 @@ class Ui_mainWindow(object):
             ButtonAction("twopowerx", "{value}" + f"{self.convert_to_superscript(2)}", lambda a: power(a, 2), True),
             ButtonAction("tworootx", f"{self.convert_to_superscript(2)}\u221a" + "{value} ", lambda a: nth_root(a, 2),
                          True),
-            # ButtonAction("invert", "{value}", lambda a: a*(-1), True),
+            ButtonAction("invert", "{value}", lambda a: a*(-1), True),
             ButtonAction("xpowery", "{value}^\u25a1", "power", lambda a: self.string_to_superscript(a)),
             RootButtonAction("yrootx", "{value}\u221a\u25a1", "root", lambda a: self.string_to_superscript(a)),
         ]
@@ -173,8 +173,6 @@ class Ui_mainWindow(object):
         if not self.ready_for_function(button, text):
             return
 
-        # TODO: Invert function
-
         for buttonAction in self.buttonActions:
             if buttonAction.name == button:
                 self.process_action(text, buttonAction)
@@ -207,7 +205,7 @@ class Ui_mainWindow(object):
 
         self.num_is_ready = False
         self.add_number("", True)
-        self.make_append(button_action)
+        text = self.make_append(button_action, text)
         if len(self.operations) > 1:
             if self.operations[-2] == "power":
                 text = self.string_to_superscript(text)
@@ -216,18 +214,24 @@ class Ui_mainWindow(object):
     ##
     # @brief Vloží operaci a číslo na zásobník, provede instantní akce a zaznačí jestli odstranit pomocný čtverec
     # @param action Akce, která se má provést
+    # @param text Text, který se podle potřeby upraví
+    # @return TODO
     #
-    def make_append(self, action):
+    def make_append(self, action, text):
         if action.instant and action.operation != "power":
             x = self.members.pop()
             self.members.append(action.operation(x))
             self.reformat_exponents(False)
+            if action.name == "invert":
+                return str(self.members[-1])
         elif action.operation == "power" or action.operation == "root":
             self.remove_square = True
             self.operations.append(action.operation)
+            return text
         else:
             self.reformat_exponents(False)
             self.operations.append(action.operation)
+            return text
 
     ##
     # @brief Kontroluje jestli stav programu umožňuje aby byla funkce dále zpracovávána
@@ -246,7 +250,7 @@ class Ui_mainWindow(object):
             return False
 
         if len(self.b_label) > 1:
-            if self.b_label[-1] == self.convert_to_superscript(2) and (button == "tworootx" or button == "twopowerx"):
+            if (self.b_label[-1] == self.convert_to_superscript(2) and not self.calc_done) and (button == "tworootx" or button == "twopowerx"):
                 return False
             elif self.b_label[-2] == ")" and (button == "yrootx" or button == 'tworootx'):
                 return False
