@@ -18,7 +18,7 @@ test: venv
 	./$(VENV)/bin/pytest math_lib_tests.py --verbose || true
 
 test-all: venv
-	./$(VENV)/bin/pytest math_lib_tests.py math_interpreter_tests.py --verbose || true
+	./$(VENV)/bin/pytest math_lib_tests.py math_interpreter_tests.py gui_tests.py --verbose || true
 
 run: venv
 	./$(VENV)/bin/python3 gui.py
