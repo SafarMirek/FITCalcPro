@@ -70,10 +70,14 @@ class MainWindow(QMainWindow):
         elif event.key() == 16777223:
             self.ui.clear_all()
 
+    def exception_hook(exctype, excvalue, exctraceback):
+        # TODO
+        #exit()
+        pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-
+    sys.excepthook = MainWindow.exception_hook
     window = MainWindow()
     window.show()
 

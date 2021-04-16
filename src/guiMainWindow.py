@@ -40,7 +40,7 @@ class Ui_mainWindow(object):
         self.num_is_ready = False
         self.remove_square = False
         self.operation_needed = False
-        self.instant_in_buffer = False
+        #self.instant_in_buffer = False
         self.buttonActions = [
             ButtonAction("sin", "sin({value}) ", lambda a: sin(a), True),
             ButtonAction("cos", "cos({value}) ", lambda a: cos(a), True),
@@ -54,7 +54,7 @@ class Ui_mainWindow(object):
             ButtonAction("tworootx", f"{self.convert_to_superscript(2)}\u221a" + "{value} ", lambda a: nth_root(a, 2),
                          True),
             ButtonAction("invert", "{value}", lambda a: a*(-1), True),
-            ButtonAction("xpowery", "{value}^\u25a1", "power", lambda a: self.string_to_superscript(a)),
+            ButtonAction("xpowery", "{value}^\u25a1", "power", False),
             RootButtonAction("yrootx", "{value}\u221a\u25a1", "root", lambda a: self.string_to_superscript(a)),
         ]
 
@@ -160,7 +160,7 @@ class Ui_mainWindow(object):
         self.move_to_buffer("", True)
         self.num_is_ready = False
         self.operation_needed = False
-        self.instant_in_buffer = False
+        #self.instant_in_buffer = False
         self.operations = []
         self.members = []
 
@@ -170,24 +170,29 @@ class Ui_mainWindow(object):
     # @param button Tlačítko jehož akce se provede
     #
     def function_button_press(self, text, button):
-        if not self.ready_for_function(button, text):
+        #if not self.ready_for_function(button, text):
+        #    return
+
+        if button == "equals":
+            self.calc_and_print(text)
             return
+
+        #is num ready? is operation needed?
 
         for buttonAction in self.buttonActions:
             if buttonAction.name == button:
                 self.process_action(text, buttonAction)
-                if buttonAction.instant:
-                    self.instant_in_buffer = True
-                else:
-                    self.instant_in_buffer = False
+                break
+                #if buttonAction.instant:
+                #    self.instant_in_buffer = True
+                #else:
+                #    self.instant_in_buffer = False
 
-        if button != "xpowery" and button != "yrootx":
-            self.operation_needed = len(self.members) == len(self.operations) + 1
-        else:
-            self.operation_needed = False
-
-        if button == "equals":
-            self.calc_and_print(text)
+        #if button != "xpowery" and button != "yrootx":
+        #    self.operation_needed = len(self.members) == len(self.operations) + 1
+        #else:
+        #    self.operation_needed = False
+        self.operation_needed = len(self.members) == len(self.operations) + 1
 
     ##
     # @brief Zpracuje zadanou funkci
@@ -195,16 +200,16 @@ class Ui_mainWindow(object):
     # @param button_action Aḱce, která se má zpracovat
     #
     def process_action(self, text, button_action):
-        if not self.operation_needed:
-            if "," in text:
-                self.members.append(float(text.replace(",", ".")))
-            elif text == regular_pi:
-                self.members.append(float(pi))
-            else:
-                self.members.append(int(text))
-
+        if self.operation_needed:
+            if not button_action.instant:
+                self.make_append(button_action, text)
+                self.move_to_buffer(button_action.get_formatted(text), False)
+            return
+        if not self.num_is_ready:
+            return
+        self.append_type(text)
         self.num_is_ready = False
-        self.add_number("", True)
+
         text = self.make_append(button_action, text)
         if len(self.operations) > 1:
             if self.operations[-2] == "power":
@@ -215,23 +220,26 @@ class Ui_mainWindow(object):
     # @brief Vloží operaci a číslo na zásobník, provede instantní akce a zaznačí jestli odstranit pomocný čtverec
     # @param action Akce, která se má provést
     # @param text Text, který se podle potřeby upraví
-    # @return TODO
+    # @return Vrací upravený text
     #
     def make_append(self, action, text):
-        if action.instant and action.operation != "power":
+        if action.instant:
             x = self.members.pop()
-            self.members.append(action.operation(x))
+            try:
+                self.members.append(action.operation(x))
+            except ValueError:
+                print("Math error")
+                # TODO: Tady muze byt taky error - Math error
             self.reformat_exponents(False)
             if action.name == "invert":
                 return str(self.members[-1])
+            return text
         elif action.operation == "power" or action.operation == "root":
             self.remove_square = True
-            self.operations.append(action.operation)
-            return text
         else:
             self.reformat_exponents(False)
-            self.operations.append(action.operation)
-            return text
+        self.operations.append(action.operation)
+        return text
 
     ##
     # @brief Kontroluje jestli stav programu umožňuje aby byla funkce dále zpracovávána
@@ -241,13 +249,13 @@ class Ui_mainWindow(object):
             if self.buttonActions[i].name == button and text == '':
                 return False
 
-        if len(self.a_label) > 1:
-            if self.a_label[-1] == ",":
-                return False
-            elif self.a_label[-2] == ')' and button == "xpowery":
-                return False
-        elif self.a_label == "" and not self.instant_in_buffer:
-            return False
+        #if len(self.a_label) > 1:
+        #    if self.a_label[-1] == ",":
+        #        return False
+        #    elif self.a_label[-2] == ')' and button == "xpowery":
+        #        return False
+        #elif self.a_label == "" and not self.instant_in_buffer:
+        #    return False
 
         if len(self.b_label) > 1:
             if (self.b_label[-1] == self.convert_to_superscript(2) and not self.calc_done) and (button == "tworootx" or button == "twopowerx"):
@@ -305,7 +313,11 @@ class Ui_mainWindow(object):
                 self.reformat_exponents(text)
         self.num_is_ready = False
         self.operation_needed = False
-        self.ans = float(eval(self.members, self.operations))
+        try:
+            self.ans = float(eval(self.members, self.operations))
+        except ValueError:
+            pass
+            # TODO: Print Math error
         if f"{self.ans}".rpartition('.')[2] == "0":
             self.ans = int(self.ans)
             self.add_number(self.ans, False)
@@ -320,7 +332,7 @@ class Ui_mainWindow(object):
     # @param text Text k převedení
     #
     def append_type(self, text):
-        if "," in text or "." in text:  # and not regular_pi:
+        if "," in text or "." in text:
             self.members.append(float(text.replace(",", ".")))
         elif regular_pi in text:
             self.members.append(float(pi))

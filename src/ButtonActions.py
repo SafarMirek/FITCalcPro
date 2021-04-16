@@ -12,7 +12,7 @@ class ButtonAction:
 
 class RootButtonAction(ButtonAction):
     def __init__(self, name, format_text, operation, to_superscript_fce):
-        super().__init__(name, format_text, operation, instant=False)
+        super().__init__(name, format_text, operation, False)
         self.to_superscript_fce = to_superscript_fce
 
     def get_formatted(self, text):
