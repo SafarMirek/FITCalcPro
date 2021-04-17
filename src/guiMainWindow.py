@@ -113,13 +113,6 @@ class Ui_mainWindow(object):
             9: u'\u2079',
             "pi": u"\u2DEB",
             "-": u"\u207B",
-            # "t":    u"\u1D57",
-            # "o":    u"\u1D52",
-            # "a":    u"\u1D43",
-            # "c":    u"\u1D9C",
-            # "n":    u"\u207F",
-            # "i":    u"\u2071",
-            # "s":    u"\u02E2",
         }
         if char != regular_pi:
             return sup_chars[int(char)]
@@ -176,6 +169,9 @@ class Ui_mainWindow(object):
         if button == "equals":
             self.calc_and_print(text)
             return
+
+        if self.calc_done:
+            self.calc_done = False
 
         #is num ready? is operation needed?
 
@@ -283,9 +279,10 @@ class Ui_mainWindow(object):
         else:
             if "^" in self.b_label:
                 self.b_label = self.b_label.replace("^\u25a1" + text, self.string_to_superscript(text))
+                self.move_to_buffer("", False)
             elif "\u221a" in self.b_label:
                 self.b_label = self.b_label.replace("\u25a1", "")
-            self.move_to_buffer("", False)
+                self.move_to_buffer("", False)
 
     ##
     # @brief Odstraní charakter, nebo celý (action_label) spodní štítek
@@ -318,6 +315,7 @@ class Ui_mainWindow(object):
         except ValueError:
             pass
             # TODO: Print Math error
+        self.clear_all()
         if f"{self.ans}".rpartition('.')[2] == "0":
             self.ans = int(self.ans)
             self.add_number(self.ans, False)
