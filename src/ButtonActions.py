@@ -25,6 +25,6 @@ class CustomButtonAction(ButtonAction):
 class PiButtonAction(ButtonAction):
 
     def get_formatted(self, value):
-        if (value == "1"):
+        if value == "1":
             value = ""
         return super().get_formatted(value)

@@ -42,7 +42,7 @@ class Ui_mainWindow(object):
         self.operation_needed = False
 
         self.buttonActions = [
-            ButtonAction("sin", "sin({value}) ", lambda a: sin(a), True),
+            ButtonAction("sin", "sin({value})", lambda a: sin(a), True),
             ButtonAction("cos", "cos({value})", lambda a: cos(a), True),
             ButtonAction("tan", "tan({value})", lambda a: tan(a), True),
             ButtonAction("factorial", "{value}!", lambda a: factorial(a), True),
