@@ -21,6 +21,7 @@ class MainWindow(QMainWindow):
 
     ##
     # @brief Namapuje funkce na příslušné klávesy
+    # param event Tlačítko, které je voláno
     #
     def keyPressEvent(self, event):
         if event.text() == "0":
@@ -46,40 +47,48 @@ class MainWindow(QMainWindow):
         elif event.text() == "," or event.text() == ".":
             self.ui.number_button_press(u",")
         elif event.text() == "+":
-            self.ui.function_button_press(self.ui.a_label, "plus")
+            self.ui.function_button_press(self.ui.input, "plus")
         elif event.text() == "-":
             self.ui.decide_minus()
         elif event.text() == "*":
-            self.ui.function_button_press(self.ui.a_label, "times")
+            self.ui.function_button_press(self.ui.input, "times")
         elif event.text() == "/":
-            self.ui.function_button_press(self.ui.a_label, "devide")
+            self.ui.function_button_press(self.ui.input, "devide")
         elif event.key() == 16777219:
-            self.ui.delete_char(False)
+            self.ui.delete_char()
         elif event.key() == 16777220 or event.key() == 16777221:
-            self.ui.function_button_press(self.ui.a_label, "equals")
+            self.ui.function_button_press(self.ui.input, "equals")
         elif event.text() == "s":
-            self.ui.function_button_press(self.ui.a_label, "sin")
+            self.ui.function_button_press(self.ui.input, "sin")
         elif event.text() == "c":
-            self.ui.function_button_press(self.ui.a_label, "cos")
+            self.ui.function_button_press(self.ui.input, "cos")
         elif event.text() == "t":
-            self.ui.function_button_press(self.ui.a_label, "tan")
+            self.ui.function_button_press(self.ui.input, "tan")
         elif event.text() == "i":
-            self.ui.function_button_press(self.ui.a_label, "invert")
+            self.ui.function_button_press(self.ui.input, "invert")
         elif event.text() == "f":
-            self.ui.function_button_press(self.ui.a_label, "factorial")
+            self.ui.function_button_press(self.ui.input, "factorial")
         elif event.key() == 16777223:
             self.ui.clear_all()
 
-    def exception_hook(exctype, excvalue, exctraceback):
-        # TODO
-        #exit()
-        pass
 
-if __name__ == '__main__':
+##
+# @brief
+#
+def error_hook(exctype, value, traceback):
+    # TODO omluva
+    run()
+
+
+##
+# @brief Spustí kalkulačku
+#
+def run():
+    sys.excepthook = error_hook
     app = QApplication(sys.argv)
-    sys.excepthook = MainWindow.exception_hook
     window = MainWindow()
     window.show()
-
     sys.exit(app.exec_())
 
+
+run()

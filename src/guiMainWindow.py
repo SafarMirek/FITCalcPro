@@ -32,96 +32,156 @@ regular_pi = "\u03c0"
 class Ui_mainWindow(object):
     def __init__(self):
         self.ans = 0
-        self.a_label = ""
-        self.b_label = ""
-        self.members = []
-        self.operations = []
+        self.input = ""
+        self.output = [ ]
+        self.members = [ ]
+        self.operations = [ ]
         self.calc_done = False
+        self.error_raised = False
         self.num_is_ready = False
-        self.remove_square = False
         self.operation_needed = False
-        #self.instant_in_buffer = False
+
         self.buttonActions = [
             ButtonAction("sin", "sin({value}) ", lambda a: sin(a), True),
-            ButtonAction("cos", "cos({value}) ", lambda a: cos(a), True),
-            ButtonAction("tan", "tan({value}) ", lambda a: tan(a), True),
-            ButtonAction("factorial", "{value}! ", lambda a: factorial(a), True),
-            ButtonAction("plus", "{value} + ", "+", False),
-            ButtonAction("minus", "{value} - ", "-", False),
-            ButtonAction("times", "{value} \u00B7 ", "*", False),
-            ButtonAction("devide", "{value} / ", "/", False),
+            ButtonAction("cos", "cos({value})", lambda a: cos(a), True),
+            ButtonAction("tan", "tan({value})", lambda a: tan(a), True),
+            ButtonAction("factorial", "{value}!", lambda a: factorial(a), True),
+            ButtonAction("plus", "+", "+", False),
+            ButtonAction("minus", "-", "-", False),
+            ButtonAction("times", "\u00B7", "*", False),
+            ButtonAction("devide", "/", "/", False),
             ButtonAction("twopowerx", "{value}" + f"{self.convert_to_superscript(2)}", lambda a: power(a, 2), True),
-            ButtonAction("tworootx", f"{self.convert_to_superscript(2)}\u221a" + "{value} ", lambda a: nth_root(a, 2),
+            ButtonAction("tworootx", f"{self.convert_to_superscript(2)}\u221a" + "{value}", lambda a: nth_root(a, 2),
                          True),
-            ButtonAction("invert", "{value}", lambda a: a*(-1), True),
-            ButtonAction("xpowery", "{value}^\u25a1", "power", False),
-            RootButtonAction("yrootx", "{value}\u221a\u25a1", "root", lambda a: self.string_to_superscript(a)),
+            ButtonAction("invert", "{value}", lambda a: a * (-1), True),
+            CustomButtonAction("xpowery", "^\u25a1", "power", lambda a, b: a + self.string_to_superscript(b)),
+            CustomButtonAction("yrootx", "\u221a\u25a1", "root",
+                               lambda a, b: self.string_to_superscript(a) + "\u221a" + b),
+            PiButtonAction("pi", "{value}\u03c0", lambda a: a * pi, True, 1),
         ]
 
     ##
-    # @brief Přidá číslo do skece vstupů
-    # @param text Text, který bude přidán do sekce vstupů
-    # @param purge Přepínač, který za vymaže obsah sekce vstupů
+    # @brief Přeformátuje posledního člena
     #
-    def add_number(self, text, purge):
+    def format_last_member(self, output):
+        if isinstance(output[ -1 ], ButtonAction):
+            return output[ -1 ].get_formatted(self.format_last_member(output[ :-1 ]))
+        return output[ -1 ]
+
+    ##
+    # @brief Při zadájní vstupu aktualizuje obsah sekce výstupů
+    #
+    def update_input(self):
+        if self.input == "":
+            if len(self.output) >= 2:
+                if isinstance(self.output[ -1 ], ButtonAction) and self.output[ -1 ].instant:
+                    self.action_label.setText(
+                        QCoreApplication.translate("mainWindow", self.format_last_member(self.output), None))
+                return
+        self.action_label.setText(QCoreApplication.translate("mainWindow", self.input, None))
+
+    ##
+    # @brief Přidá číslo do skece vstupů
+    # @param input Text, který bude přidán do sekce vstupů
+    #
+    def set_input(self, input):
+        self.input = str(input)
+        self.update_input()
+
+    ##
+    # @brief Vymaže sekci vstupů
+    #
+    def clear_input(self):
+        self.set_input("")
+
+    ##
+    # @brief Přidá číslo do skece vstupů
+    # @param to_add Text, který bude přidán do sekce vstupů
+    #
+    def add_to_input(self, to_add):
         if self.operation_needed:
             return
 
-        if self.a_label == regular_pi and not purge:
+        if len(self.input) > 22:
             return
 
-        if purge:
-            self.a_label = ""
-            self.num_is_ready = False
-        else:
-            self.a_label += f"{text}"
-            if text != "," or text != "-":
-                self.num_is_ready = True
-
+        self.input += f"{to_add}"
+        self.num_is_ready = to_add != "," and to_add != "-"
         self.action_label.setText(
-            QCoreApplication.translate("mainWindow", self.a_label, None))
+            QCoreApplication.translate("mainWindow", self.input, None))
 
     ##
     # @brief Přidá číslo do zásobníku vstupů
-    # @param text Text, který bude přidán do zásobníku vstupů
-    # @param purge Přepínač, který za vymaže obsah zásobníku vstupů
+    # @param to_add Text, který bude přidán do zásobníku výtupů
     #
-    def move_to_buffer(self, text, purge):
-        if purge:
-            self.b_label = u""
-        else:
-            self.b_label += f"{text}"
-        self.buffer_label.setText(QCoreApplication.translate("mainWindow", self.b_label, None))
+    def add_to_output_buffer(self, to_add):
+        self.output.append(to_add)
+        self.reformat_output()
         if not self.calc_done:
-            self.add_number("", True)
+            self.clear_input()
+
+    ##
+    # @brief Převede uživatelské vstupy na požadovaný formát pro výpis
+    #
+    def reformat_output(self):
+        output = self.output.copy()
+        output_str = ""
+        i = 0
+        while i < len(output):
+            if isinstance(output[ i ], ButtonAction):
+                if output[ i ].instant:
+                    output[ i - 1 ] = output[ i ].get_formatted(output[ i - 1 ])
+                    del output[ i ]
+                    continue
+            i = i + 1
+        i = 0
+        while i < len(output) - 1:
+            if isinstance(output[ i ], CustomButtonAction):
+                output[ i - 1 ] = output[ i ].to_superscript_fce(str(output[ i - 1 ]), str(output[ i + 1 ]))
+                del output[ i + 1 ]
+                del output[ i ]
+                continue
+            i = i + 1
+
+        for member in output:
+            output_str += str(member) + " "
+        self.buffer_label.setText(QCoreApplication.translate("mainWindow", output_str, None))
 
     ##
     # @brief Převádí zadaný text na horní index
     # @param char Charakter, který bude převeden na horní index
     #
     def convert_to_superscript(self, char):
+        char = str(char)
         sup_chars = {
-            0: u'\u2070',
-            1: u'\xb9',
-            2: u'\xb2',
-            3: u'\xb3',
-            4: u'\u2074',
-            5: u'\u2075',
-            6: u'\u2076',
-            7: u'\u2077',
-            8: u'\u2078',
-            9: u'\u2079',
-            "pi": u"\u2DEB",
+            "0": u'\u2070',
+            "1": u'\u00B9',
+            "2": u'\u00B2',
+            "3": u'\u00B3',
+            "4": u'\u2074',
+            "5": u'\u2075',
+            "6": u'\u2076',
+            "7": u'\u2077',
+            "8": u'\u2078',
+            "9": u'\u2079',
+            u"\u03c0": u"\u2DEB",
             "-": u"\u207B",
+            "t": u"\u1D57",
+            "o": u"\u1D52",
+            "a": u"\u1D43",
+            "c": u"\u1D9C",
+            "n": u"\u207F",
+            "i": u"\u2071",
+            "s": u"\u02E2",
+            "(": u"\u207d",
+            ")": u"\u207e",
+            ",": u"\u22C5",
         }
-        if char != regular_pi:
-            return sup_chars[int(char)]
-        elif isinstance(char, str):
-            return sup_chars[char]
+        return sup_chars.get(char, ' ')
 
     ##
     # @brief Převede libovolně dlouhý string na horní index
-    # @param text Text, který bude převeden na horní index
+    # @param string Text, který bude převeden na horní index
     #
     def string_to_superscript(self, string):
         output = ""
@@ -131,63 +191,67 @@ class Ui_mainWindow(object):
 
     ##
     # @brief Funkce vyvolaná stisknutím tlačítka
-    # @param text Text, který bude předán do
+    # @param button_text Text, který bude předán do inputu
     #
-    def number_button_press(self, text):
-        if self.calc_done:
+    def number_button_press(self, button_text):
+        if self.calc_done:  # Vyresetuje kalkulačku, když po = začneme zadávat čísla
             self.clear_all()
             self.calc_done = False
 
-        if text == "," and "," in self.a_label:
+        if button_text == "," and "," in self.input:
             return
-        elif self.a_label == "" and text == ",":
+        elif self.input == "" and button_text == ",":
             return
 
-        self.add_number(text, False)
+        self.add_to_input(button_text)
 
     ##
     # @brief Vyčistí a resetuje o všechny parametry kalkulačky do startovací hodnoty
     #
     def clear_all(self):
-        self.delete_char(True)
-        self.move_to_buffer("", True)
+        self.calc_done = False
+        self.error_raised = False
         self.num_is_ready = False
         self.operation_needed = False
-        #self.instant_in_buffer = False
-        self.operations = []
-        self.members = []
+
+        self.output = [ ]
+        self.operations = [ ]
+        self.members = [ ]
+        self.clear_input()
+        self.reformat_output()
+
+    ##
+    # @brief Resetuje kalkulačku pokud nastane chyba
+    #
+    def exit_on_error(self):
+        self.clear_all()
+        self.action_label.setText(
+            QCoreApplication.translate("mainWindow", "Math error", None))
 
     ##
     # @brief Funkce vyvolaná stisknutím tlačítka
-    # @param text Text, který bude předán do
-    # @param button Tlačítko jehož akce se provede
+    # @param text String na jehož vstupu se funkce provede
+    # @param button Tlačítko jehož funkce se provede
     #
     def function_button_press(self, text, button):
-        #if not self.ready_for_function(button, text):
-        #    return
+        if self.calc_done:  # Pokračování ve výpočtech po = (použití answer)
+            self.clear_all()
+            self.calc_done = False
+            self.num_is_ready = True
+
+        if self.error_raised:
+            self.input = self.input[ 1: ]
+            self.error_raised = False
 
         if button == "equals":
             self.calc_and_print(text)
             return
 
-        if self.calc_done:
-            self.calc_done = False
-
-        #is num ready? is operation needed?
-
         for buttonAction in self.buttonActions:
             if buttonAction.name == button:
                 self.process_action(text, buttonAction)
                 break
-                #if buttonAction.instant:
-                #    self.instant_in_buffer = True
-                #else:
-                #    self.instant_in_buffer = False
 
-        #if button != "xpowery" and button != "yrootx":
-        #    self.operation_needed = len(self.members) == len(self.operations) + 1
-        #else:
-        #    self.operation_needed = False
         self.operation_needed = len(self.members) == len(self.operations) + 1
 
     ##
@@ -196,24 +260,27 @@ class Ui_mainWindow(object):
     # @param button_action Aḱce, která se má zpracovat
     #
     def process_action(self, text, button_action):
-        if self.operation_needed:
-            if not button_action.instant:
+        try:
+            if self.operation_needed:
                 self.make_append(button_action, text)
-                self.move_to_buffer(button_action.get_formatted(text), False)
-            return
-        if not self.num_is_ready:
-            return
-        self.append_type(text)
-        self.num_is_ready = False
+                self.add_to_output_buffer(button_action)
+                return
+            if not self.num_is_ready:
+                if not button_action.has_implicit_value() or text != "":
+                    return
+                text = str(button_action.implicit_value)
+            self.append_type(text)
 
-        text = self.make_append(button_action, text)
-        if len(self.operations) > 1:
-            if self.operations[-2] == "power":
-                text = self.string_to_superscript(text)
-        self.move_to_buffer(button_action.get_formatted(text), False)
+            text = self.make_append(button_action, text)
+            self.add_to_output_buffer(text)
+            self.add_to_output_buffer(button_action)
+
+            self.num_is_ready = False
+        except ValueError:
+            self.exit_on_error()
 
     ##
-    # @brief Vloží operaci a číslo na zásobník, provede instantní akce a zaznačí jestli odstranit pomocný čtverec
+    # @brief Vloží operaci a číslo na zásobník, provede instantní funkce
     # @param action Akce, která se má provést
     # @param text Text, který se podle potřeby upraví
     # @return Vrací upravený text
@@ -221,130 +288,79 @@ class Ui_mainWindow(object):
     def make_append(self, action, text):
         if action.instant:
             x = self.members.pop()
-            try:
-                self.members.append(action.operation(x))
-            except ValueError:
-                print("Math error")
-                # TODO: Tady muze byt taky error - Math error
-            self.reformat_exponents(False)
+            self.members.append(action.operation(x))
             if action.name == "invert":
-                return str(self.members[-1])
+                return str(self.members[ -1 ])
             return text
-        elif action.operation == "power" or action.operation == "root":
-            self.remove_square = True
-        else:
-            self.reformat_exponents(False)
         self.operations.append(action.operation)
         return text
 
     ##
-    # @brief Kontroluje jestli stav programu umožňuje aby byla funkce dále zpracovávána
+    # @brief Odstraní charakter, nebo celou sekci vstupů
     #
-    def ready_for_function(self, button, text):
-        for i in range(0, 3):
-            if self.buttonActions[i].name == button and text == '':
-                return False
-
-        #if len(self.a_label) > 1:
-        #    if self.a_label[-1] == ",":
-        #        return False
-        #    elif self.a_label[-2] == ')' and button == "xpowery":
-        #        return False
-        #elif self.a_label == "" and not self.instant_in_buffer:
-        #    return False
-
-        if len(self.b_label) > 1:
-            if (self.b_label[-1] == self.convert_to_superscript(2) and not self.calc_done) and (button == "tworootx" or button == "twopowerx"):
-                return False
-            elif self.b_label[-2] == ")" and (button == "yrootx" or button == 'tworootx'):
-                return False
-
-        if self.calc_done and float(self.a_label.replace(",", ".")) == float(self.ans):
-            self.calc_done = False
-            self.move_to_buffer("", True)
-            del self.members[0]
-
-        return True
-
-    ##
-    # @brief Odstraní pomocný čtverec z mocniné a odmocniné funkce
-    # @param text Text k reformátování
-    #
-    def reformat_exponents(self, text):
-        if self.remove_square and not text:
-            if "^" in self.b_label:
-                self.b_label = self.b_label[:-2]
-            elif "\u221a" in self.b_label:
-                self.b_label = self.b_label[:-1]
-        else:
-            if "^" in self.b_label:
-                self.b_label = self.b_label.replace("^\u25a1" + text, self.string_to_superscript(text))
-                self.move_to_buffer("", False)
-            elif "\u221a" in self.b_label:
-                self.b_label = self.b_label.replace("\u25a1", "")
-                self.move_to_buffer("", False)
-
-    ##
-    # @brief Odstraní charakter, nebo celý (action_label) spodní štítek
-    # @param delete_all Pokud je nastaveno na True vymaže celý spodní štítek, jinak jen jeden charakter
-    #
-    def delete_char(self, delete_all):
-        if delete_all:
-            self.a_label = ""
-            self.action_label.setText(QCoreApplication.translate("mainWindow", self.a_label, None))
-        elif self.calc_done:
+    def delete_char(self):
+        if self.calc_done:
             self.clear_all()
         else:
-            self.a_label = self.a_label[:-1]
-            self.action_label.setText(QCoreApplication.translate("mainWindow", self.a_label, None))
+            self.input = self.input[ :-1 ]
+            self.action_label.setText(QCoreApplication.translate("mainWindow", self.input, None))
 
     ##
-    # @brief Přidá do zásobníku zbylou hodnotu a vytiskne číslo dle jeho typu
+    # @brief Přidá do zásobníku zbylou hodnotu, vypočítá obsah kalkulačky a vytiskne na výstup číslo dle jeho typu
     # @param text Hodnota z pole vstupů
     #
     def calc_and_print(self, text):
-        self.move_to_buffer(text, False)
         if text != "":
             self.append_type(text)
-            if self.remove_square:
-                self.reformat_exponents(text)
+            self.add_to_output_buffer(text)
+        try:
+            self.ans = eval(self.members, self.operations)
+        except (ValueError, IndexError):
+            self.exit_on_error()
+            return
         self.num_is_ready = False
         self.operation_needed = False
-        try:
-            self.ans = float(eval(self.members, self.operations))
-        except ValueError:
-            pass
-            # TODO: Print Math error
         self.clear_all()
-        if f"{self.ans}".rpartition('.')[2] == "0":
-            self.ans = int(self.ans)
-            self.add_number(self.ans, False)
-        else:
-            self.ans = round(float(self.ans), accuracy)
-            self.add_number(f"{self.ans}".replace(".", ","), False)
+
+        if isinstance(self.ans, float):
+            if f"{self.ans}".rpartition('.')[ 2 ] == "0":
+                self.ans = int(self.ans)
+            else:
+                self.ans = round(float(self.ans), accuracy)
+
+        while len(str(self.ans)) > 22:
+            if isinstance(self.ans, int):
+                try:
+                    self.ans = float(self.ans)
+                    continue
+                except:
+                    pass
+            self.exit_on_error()
+            return
+        self.set_input(f"{self.ans}".replace(".", ","))
 
         self.calc_done = True
 
     ##
-    # @brief Přidá do zásobníku čísel číslo ve správném typu
-    # @param text Text k převedení
+    # @brief Přidá do zásobníku členů číslo ve správném typu
+    # @param input_number Číslo, které bude přidáno
     #
-    def append_type(self, text):
-        if "," in text or "." in text:
-            self.members.append(float(text.replace(",", ".")))
-        elif regular_pi in text:
+    def append_type(self, input_number):
+        if "," in input_number or "." in input_number:
+            self.members.append(float(input_number.replace(",", ".")))
+        elif regular_pi in input_number:
             self.members.append(float(pi))
         else:
-            self.members.append(int(text))
+            self.members.append(int(input_number))
 
     ##
     # @brief Rozhodne zda se mínus bude chovat jako znaménko, nebo operace
     #
     def decide_minus(self):
-        if self.a_label == "":
+        if self.input == "":
             self.number_button_press(u"-")
         else:
-            self.function_button_press(self.a_label, "minus")
+            self.function_button_press(self.input, "minus")
 
     ##
     # @brief Inicializuje rozložení aplikace
@@ -394,7 +410,7 @@ class Ui_mainWindow(object):
                                    "	color: rgb(30, 30, 30);\n"
                                    "}")
         self.xpowery.setFlat(True)
-        self.xpowery.clicked.connect(lambda: self.function_button_press(self.a_label, "xpowery"))
+        self.xpowery.clicked.connect(lambda: self.function_button_press(self.input, "xpowery"))
 
         self.gridLayout.addWidget(self.xpowery, 0, 0, 1, 1)
 
@@ -422,7 +438,7 @@ class Ui_mainWindow(object):
                                   "	color: rgb(30, 30, 30);\n"
                                   "}")
         self.yrootx.setFlat(True)
-        self.yrootx.clicked.connect(lambda: self.function_button_press(self.a_label, "yrootx"))
+        self.yrootx.clicked.connect(lambda: self.function_button_press(self.input, "yrootx"))
 
         self.gridLayout.addWidget(self.yrootx, 0, 1, 1, 1)
 
@@ -450,7 +466,7 @@ class Ui_mainWindow(object):
                                      "	color: rgb(30, 30, 30);\n"
                                      "}")
         self.twopowerx.setFlat(True)
-        self.twopowerx.clicked.connect(lambda: self.function_button_press(self.a_label, "twopowerx"))
+        self.twopowerx.clicked.connect(lambda: self.function_button_press(self.input, "twopowerx"))
 
         self.gridLayout.addWidget(self.twopowerx, 0, 2, 1, 1)
 
@@ -478,7 +494,7 @@ class Ui_mainWindow(object):
                                     "	color: rgb(30, 30, 30);\n"
                                     "}")
         self.tworootx.setFlat(True)
-        self.tworootx.clicked.connect(lambda: self.function_button_press(self.a_label, "tworootx"))
+        self.tworootx.clicked.connect(lambda: self.function_button_press(self.input, "tworootx"))
 
         self.gridLayout.addWidget(self.tworootx, 0, 3, 1, 1)
 
@@ -506,7 +522,7 @@ class Ui_mainWindow(object):
                                      "	color: rgb(30, 30, 30);\n"
                                      "}")
         self.factorial.setFlat(True)
-        self.factorial.clicked.connect(lambda: self.function_button_press(self.a_label, "factorial"))
+        self.factorial.clicked.connect(lambda: self.function_button_press(self.input, "factorial"))
 
         self.gridLayout.addWidget(self.factorial, 0, 4, 1, 1)
 
@@ -534,7 +550,7 @@ class Ui_mainWindow(object):
                                     "	color: rgb(30, 30, 30);\n"
                                     "}")
         self.invertor.setFlat(True)
-        self.invertor.clicked.connect(lambda: self.function_button_press(self.a_label, "invert"))
+        self.invertor.clicked.connect(lambda: self.function_button_press(self.input, "invert"))
 
         self.gridLayout.addWidget(self.invertor, 1, 0, 1, 1)
 
@@ -562,7 +578,7 @@ class Ui_mainWindow(object):
                                "	color: rgb(30, 30, 30);\n"
                                "}")
         self.sin.setFlat(True)
-        self.sin.clicked.connect(lambda: self.function_button_press(self.a_label, "sin"))
+        self.sin.clicked.connect(lambda: self.function_button_press(self.input, "sin"))
 
         self.gridLayout.addWidget(self.sin, 1, 1, 1, 1)
 
@@ -590,7 +606,7 @@ class Ui_mainWindow(object):
                                "	color: rgb(30, 30, 30);\n"
                                "}")
         self.cos.setFlat(True)
-        self.cos.clicked.connect(lambda: self.function_button_press(self.a_label, "cos"))
+        self.cos.clicked.connect(lambda: self.function_button_press(self.input, "cos"))
 
         self.gridLayout.addWidget(self.cos, 1, 2, 1, 1)
 
@@ -618,7 +634,7 @@ class Ui_mainWindow(object):
                                "	color: rgb(30, 30, 30);\n"
                                "}")
         self.tan.setFlat(True)
-        self.tan.clicked.connect(lambda: self.function_button_press(self.a_label, "tan"))
+        self.tan.clicked.connect(lambda: self.function_button_press(self.input, "tan"))
 
         self.gridLayout.addWidget(self.tan, 1, 3, 1, 1)
 
@@ -646,7 +662,7 @@ class Ui_mainWindow(object):
                               "	color: rgb(30, 30, 30);\n"
                               "}")
         self.pi.setFlat(True)
-        self.pi.clicked.connect(lambda: self.number_button_press(u"\u03c0"))
+        self.pi.clicked.connect(lambda: self.function_button_press(self.input, "pi"))
 
         self.gridLayout.addWidget(self.pi, 1, 4, 1, 1)
 
@@ -786,7 +802,7 @@ class Ui_mainWindow(object):
                                   "	color: rgb(30, 30, 30);\n"
                                   "}")
         self.delete.setFlat(True)
-        self.delete.clicked.connect(lambda: self.delete_char(False))
+        self.delete.clicked.connect(lambda: self.delete_char())
 
         self.gridLayout.addWidget(self.delete, 2, 4, 1, 1)
 
@@ -898,7 +914,7 @@ class Ui_mainWindow(object):
                                  "	color: rgb(30, 30, 30);\n"
                                  "}")
         self.times.setFlat(True)
-        self.times.clicked.connect(lambda: self.function_button_press(self.a_label, "times"))
+        self.times.clicked.connect(lambda: self.function_button_press(self.input, "times"))
 
         self.gridLayout.addWidget(self.times, 3, 3, 1, 1)
 
@@ -926,7 +942,7 @@ class Ui_mainWindow(object):
                                   "	color: rgb(30, 30, 30);\n"
                                   "}")
         self.devide.setFlat(True)
-        self.devide.clicked.connect(lambda: self.function_button_press(self.a_label, "devide"))
+        self.devide.clicked.connect(lambda: self.function_button_press(self.input, "devide"))
 
         self.gridLayout.addWidget(self.devide, 3, 4, 1, 1)
 
@@ -1038,7 +1054,7 @@ class Ui_mainWindow(object):
                                 "	color: rgb(30, 30, 30);\n"
                                 "}")
         self.plus.setFlat(True)
-        self.plus.clicked.connect(lambda: self.function_button_press(self.a_label, "plus"))
+        self.plus.clicked.connect(lambda: self.function_button_press(self.input, "plus"))
 
         self.gridLayout.addWidget(self.plus, 4, 3, 1, 1)
 
@@ -1178,7 +1194,7 @@ class Ui_mainWindow(object):
                                   "	color: rgb(30, 30, 30);\n"
                                   "}")
         self.equals.setFlat(True)
-        self.equals.clicked.connect(lambda: self.function_button_press(self.a_label, "equals"))
+        self.equals.clicked.connect(lambda: self.function_button_press(self.input, "equals"))
 
         self.gridLayout.addWidget(self.equals, 5, 3, 1, 1)
 
@@ -1252,7 +1268,7 @@ class Ui_mainWindow(object):
         self.menuasd = QMenu(self.menubar)
         self.menuasd.setObjectName(u"menuasd")
         self.menuasd.setStyleSheet(u"QMenu {\n"
-                                   "	color: rgb(0,0,0);\n"
+                                   "	color: rgb(255,255,255);\n"
                                    "}")
         mainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(mainWindow)
