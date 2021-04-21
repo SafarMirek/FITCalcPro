@@ -1,0 +1,13 @@
+Source: fitcalcpro
+Section: Calc
+Priority: optional
+Maintainer: Miroslav Šafář <xsafar23@stud.fit.vutbr.cz>
+Build-Depends: debhelper-compat (= 12)
+Standards-Version: 4.4.1
+Homepage: https://github.com/SafarMirek/FITCalcPro
+
+Package: fitcalcpro
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Calculator
+ Basic math operations.
