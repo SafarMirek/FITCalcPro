@@ -66,10 +66,10 @@ def multiply(a, b):
 # @exception ZeroDivisionError pokud se druhé číslo rovná nule.
 #
 def divide(a, b):
-    try:
-        ret = a / b
-    except b == 0:
-        raise ZeroDivisionError
+    if b == 0:
+        raise ValueError
+
+    ret = a / b
     return round(ret, accuracy)
 
 
