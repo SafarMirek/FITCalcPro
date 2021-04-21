@@ -15,6 +15,10 @@
 ##
 ## Created by: Qt User Interface Compiler version 6.0.1
 ################################################################################
+import os
+import sys
+import webbrowser
+
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
@@ -40,6 +44,8 @@ class Ui_mainWindow(object):
         self.error_raised = False
         self.num_is_ready = False
         self.operation_needed = False
+        self.doc_path = f"{os.path.dirname(sys.argv[0])}/TODO" # TODO
+        self.guide_path = f"{os.path.dirname(sys.argv[0])}/TODO" # TODO
 
         self.buttonActions = [
             ButtonAction("sin", "sin({value})", lambda a: sin(a), True),
@@ -1223,6 +1229,7 @@ class Ui_mainWindow(object):
                                  "	color: rgb(255, 255, 255);\n"
                                  "}")
         self.guide.setFlat(True)
+        self.guide.clicked.connect(lambda: webbrowser.open_new(self.doc_path))
 
         self.gridLayout.addWidget(self.guide, 5, 4, 1, 1)
 
@@ -1266,6 +1273,21 @@ class Ui_mainWindow(object):
         self.menubar = QMenuBar(mainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 400, 23))
+        self.menubar.setStyleSheet(u"QMenuBar {\n"
+                                   "    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+                                   "        stop:0 rgb(50,50,50), stop:1 rgb(40,40,40));\n"
+                                   "}\n"
+                                   "QMenuBar::item {\n"
+                                   "    spacing: 3px;           \n"
+                                   "    padding: 2px 10px;\n"
+                                   "    color: rgb(255,255,255);  \n"
+                                   "}\n"
+                                   "QMenuBar::item:selected {    \n"
+                                   "    background-color: rgb(80,80,80);\n"
+                                   "}\n"
+                                   "QMenuBar::item:pressed {\n"
+                                   "    background: rgb(120,120,120);\n"
+                                   "}")
         self.menuasd = QMenu(self.menubar)
         self.menuasd.setObjectName(u"menuasd")
         self.menuasd.setStyleSheet(u"QMenu {\n"
@@ -1276,7 +1298,25 @@ class Ui_mainWindow(object):
         self.statusbar.setObjectName(u"statusbar")
         mainWindow.setStatusBar(self.statusbar)
 
+        self.actionNapoveda = QAction(mainWindow)
+        self.actionNapoveda.setObjectName(u"actionNapoveda")
+        self.actionNapoveda.triggered.connect(lambda: webbrowser.open_new(self.guide_path))
+        self.actionManual = QAction(mainWindow)
+        self.actionManual.setObjectName(u"actionDokumentace")
+        self.actionManual.triggered.connect(lambda: webbrowser.open_new(self.doc_path))
+
         self.menubar.addAction(self.menuasd.menuAction())
+
+        mainWindow.setMenuBar(self.menubar)
+        self.statusbar = QStatusBar(mainWindow)
+        self.statusbar.setObjectName(u"statusbar")
+        mainWindow.setStatusBar(self.statusbar)
+
+        self.menubar.addAction(self.menuasd.menuAction())
+        self.menuasd.addSeparator()
+        self.menuasd.addAction(self.actionManual)
+        self.menuasd.addSeparator()
+        self.menuasd.addAction(self.actionNapoveda)
 
         self.retranslateUi(mainWindow)
 
@@ -1289,6 +1329,8 @@ class Ui_mainWindow(object):
     #
     def retranslateUi(self, mainWindow):
         mainWindow.setWindowTitle(QCoreApplication.translate("mainWindow", u"FitCalcPro", None))
+        self.actionManual.setText(QCoreApplication.translate("mainWindow", u"Manu\u00E1l", None))
+        self.actionNapoveda.setText(QCoreApplication.translate("mainWindow", u"N\u00e1pov\u011bda", None))
         self.xpowery.setText(QCoreApplication.translate("mainWindow", u"x\u02b8", None))
         self.yrootx.setText(QCoreApplication.translate("mainWindow", u"\u02b8\u221ax", None))
         self.twopowerx.setText(QCoreApplication.translate("mainWindow", u"x\u00b2", None))
@@ -1321,4 +1363,4 @@ class Ui_mainWindow(object):
         self.guide.setText(QCoreApplication.translate("mainWindow", u"???", None))
         self.buffer_label.setText(QCoreApplication.translate("mainWindow", u"", None))
         self.action_label.setText(QCoreApplication.translate("mainWindow", u"Zadejte p\u0159\u00edklad", None))
-        self.menuasd.setTitle(QCoreApplication.translate("mainWindow", u"Dokumentace", None))
+        self.menuasd.setTitle(QCoreApplication.translate("mainWindow", u"N\u00e1pov\u011bda"))

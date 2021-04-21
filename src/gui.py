@@ -5,21 +5,21 @@
 
 import sys
 
-from PySide2 import QtCore
-from PySide2.QtCore import QTimer
+from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from guiMainWindow import Ui_mainWindow
 
 
 ##
-# @brief Inicializuje rozložení aplikace
+# @brief Třída hlavního okna
 #
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_mainWindow()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("FITCalcProIcon.png"))
 
     ##
     # @brief Namapuje funkce na příslušné klávesy
@@ -70,9 +70,6 @@ class MainWindow(QMainWindow):
             self.ui.function_button_press(self.ui.input, "invert")
         elif event.text() == "f":
             self.ui.function_button_press(self.ui.input, "factorial")
-        # TODO(oddelat test na chybu)
-        elif event.text() == "e":
-            raise RuntimeError
         elif event.key() == 16777223:
             self.ui.clear_all()
 
@@ -105,7 +102,7 @@ def error_hook(exctype, value, traceback):
 #
 def run():
     window.show()
-    app.exec_()
+    exit(app.exec_())
 
 
 sys.excepthook = error_hook
