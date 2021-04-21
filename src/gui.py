@@ -5,7 +5,9 @@
 
 import sys
 
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2 import QtCore
+from PySide2.QtCore import QTimer
+from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from guiMainWindow import Ui_mainWindow
 
@@ -68,15 +70,33 @@ class MainWindow(QMainWindow):
             self.ui.function_button_press(self.ui.input, "invert")
         elif event.text() == "f":
             self.ui.function_button_press(self.ui.input, "factorial")
+        # TODO(oddelat test na chybu)
+        elif event.text() == "e":
+            raise RuntimeError
         elif event.key() == 16777223:
             self.ui.clear_all()
 
+    ##
+    # @brief Vypíše chybu v separátním podokně a ukončí aplikaci
+    #
+    def show_error_window(self):
+        self.error = QMessageBox()
+        self.error.setWindowTitle("Chyba")
+        self.error.setInformativeText("Omlouváme se, něco se nepovedlo.")
+        self.error.setIcon(QMessageBox.Warning)
+        self.error.setStandardButtons(QMessageBox.Ok)
+        err_msg = self.error.exec_()
+        app.exit(1)
+
 
 ##
-# @brief
+# @brief Zachytí chybu a zobrazí chybové okno
+# @param exctype Typ chyby
+# @param value Hodnota chyby
+# @param traceback Shrnutí chyby
 #
 def error_hook(exctype, value, traceback):
-    # TODO omluva
+    MainWindow.show_error_window(window)
     run()
 
 
@@ -84,11 +104,12 @@ def error_hook(exctype, value, traceback):
 # @brief Spustí kalkulačku
 #
 def run():
-    sys.excepthook = error_hook
-    app = QApplication(sys.argv)
-    window = MainWindow()
     window.show()
-    sys.exit(app.exec_())
+    app.exec_()
 
+
+sys.excepthook = error_hook
+app = QApplication(sys.argv)
+window = MainWindow()
 
 run()

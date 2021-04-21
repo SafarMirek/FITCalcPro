@@ -58,6 +58,7 @@ class Ui_mainWindow(object):
             CustomButtonAction("yrootx", "\u221a\u25a1", "root",
                                lambda a, b: self.string_to_superscript(a) + "\u221a" + b),
             PiButtonAction("pi", "{value}\u03c0", lambda a: a * pi, True, 1),
+            PiButtonAction("ans", "Ans", lambda a: a * self.ans, True, 1),
         ]
 
     ##
@@ -1166,7 +1167,7 @@ class Ui_mainWindow(object):
                                "	color: rgb(30, 30, 30);\n"
                                "}")
         self.Ans.setFlat(True)
-        self.Ans.clicked.connect(lambda: self.number_button_press(f"{self.ans}".replace(".", ",")))
+        self.Ans.clicked.connect(lambda: self.function_button_press(self.input, "ans"))
 
         self.gridLayout.addWidget(self.Ans, 5, 2, 1, 1)
 
