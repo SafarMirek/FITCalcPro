@@ -44,8 +44,8 @@ class Ui_mainWindow(object):
         self.error_raised = False
         self.num_is_ready = False
         self.operation_needed = False
-        self.doc_path = f"{os.path.dirname(sys.argv[0])}/TODO" # TODO
-        self.guide_path = f"{os.path.dirname(sys.argv[0])}/TODO" # TODO
+        self.doc_path = f"{os.path.dirname(sys.argv[0]).replace('src', '')}/user_documentation.pdf" # TODO
+        self.guide_path = f"{os.path.dirname(sys.argv[0])}/help.pdf" # TODO
 
         self.buttonActions = [
             ButtonAction("sin", "sin({value})", lambda a: sin(a), True),
@@ -1229,7 +1229,7 @@ class Ui_mainWindow(object):
                                  "	color: rgb(255, 255, 255);\n"
                                  "}")
         self.guide.setFlat(True)
-        self.guide.clicked.connect(lambda: webbrowser.open_new(self.doc_path))
+        self.guide.clicked.connect(lambda: webbrowser.open_new(self.guide_path))
 
         self.gridLayout.addWidget(self.guide, 5, 4, 1, 1)
 
