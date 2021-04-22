@@ -103,14 +103,7 @@ def power(a, exp):
     if not isinstance(exp, int):
         raise ValueError
 
-    if exp == 0 or a == 1:
-        return 1
-
-    num = 1
-    while exp != 0:
-        num = a * num
-        exp = exp - 1
-    return num
+    return a ** exp
 
 
 ##
