@@ -1,0 +1,8 @@
+[Desktop Entry]
+Categories=Qt;Calc;
+Exec=fitcalcpro
+GenericName=FITCalcPro
+Icon=/usr/share/pixmaps/fitcalcpro.xpm
+Name=FITCalcPro
+Type=Application
+X-KDE-StartupNotify=false
