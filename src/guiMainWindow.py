@@ -27,26 +27,38 @@ from ButtonActions import *
 from math_interpreter import *
 from math_lib import *
 
-regular_pi = "\u03c0"
-
 
 ##
 # @brief Třída s rozložením kalkulačky
 #
 class Ui_mainWindow(object):
+    ##
+    # @brief Konstruktor
+    #
     def __init__(self):
+        ## předchozí výsledek
         self.ans = 0
+        ## řetězec se vstupem
         self.input = ""
+        ## pole členů k formátování pro výstup
         self.output = [ ]
+        ## čísla, která kalkulačka kontroluje
         self.members = [ ]
+        ## operace, které kalkulačka provádí s čísly
         self.operations = [ ]
+        ## přepínač indikující, že byl dokončen výpočet
         self.calc_done = False
+        ## přepínač indikující, že se ve výpočtu nastala chyba
         self.error_raised = False
+        ## přepínač indikující, že je číslo připravené pro operaci
         self.num_is_ready = False
-        self.operation_needed = False
+        ## přepínač indikující, že je potřeba zadat operaci
+        self.operation_needed = 
+        ## cesta k dokumentaci
         self.doc_path = f"{os.path.dirname(sys.argv[0])}/user_documentation.pdf"
+        ## cesta k nápovědě
         self.guide_path = f"{os.path.dirname(sys.argv[0])}/help.pdf"
-
+        ## pole akcí kalkulačky
         self.buttonActions = [
             ButtonAction("sin", "sin({value})", lambda a: sin(a), True),
             ButtonAction("cos", "cos({value})", lambda a: cos(a), True),
@@ -355,7 +367,7 @@ class Ui_mainWindow(object):
     def append_type(self, input_number):
         if "," in input_number or "." in input_number:
             self.members.append(float(input_number.replace(",", ".")))
-        elif regular_pi in input_number:
+        elif "\u03c0" in input_number: # "\u03c0" je unicode znak pi
             self.members.append(float(pi))
         else:
             self.members.append(int(input_number))
@@ -378,16 +390,20 @@ class Ui_mainWindow(object):
         mainWindow.resize(400, 600)
         mainWindow.setFixedSize(QSize(400, 600))
         mainWindow.setStyleSheet(u"background-color: rgb(40, 40, 40);")
+        ## rozložení středního widgetu
         self.centralwidget = QWidget(mainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
+        ## rozložení widgetu
         self.layoutWidget = QWidget(self.centralwidget)
         self.layoutWidget.setObjectName(u"layoutWidget")
         self.layoutWidget.setGeometry(QRect(0, 120, 401, 451))
+        ## mřížové rozložení
         self.gridLayout = QGridLayout(self.layoutWidget)
         self.gridLayout.setSpacing(15)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setSizeConstraint(QLayout.SetNoConstraint)
         self.gridLayout.setContentsMargins(15, 15, 15, 15)
+        ## tlačítko přirozené mocniny
         self.xpowery = QPushButton(self.layoutWidget)
         self.xpowery.setObjectName(u"xpowery")
         self.xpowery.setEnabled(True)
@@ -397,6 +413,7 @@ class Ui_mainWindow(object):
         sizePolicy.setHeightForWidth(self.xpowery.sizePolicy().hasHeightForWidth())
         self.xpowery.setSizePolicy(sizePolicy)
         self.xpowery.setMaximumSize(QSize(60, 60))
+
         font = QFont()
         font.setPointSize(20)
         self.xpowery.setFont(font)
@@ -421,6 +438,7 @@ class Ui_mainWindow(object):
 
         self.gridLayout.addWidget(self.xpowery, 0, 0, 1, 1)
 
+        ## tlačítko přirozené odmocniny
         self.yrootx = QPushButton(self.layoutWidget)
         self.yrootx.setObjectName(u"yrootx")
         self.yrootx.setEnabled(True)
@@ -448,7 +466,7 @@ class Ui_mainWindow(object):
         self.yrootx.clicked.connect(lambda: self.function_button_press(self.input, "yrootx"))
 
         self.gridLayout.addWidget(self.yrootx, 0, 1, 1, 1)
-
+        ## tlačítko druhé mocniny
         self.twopowerx = QPushButton(self.layoutWidget)
         self.twopowerx.setObjectName(u"twopowerx")
         self.twopowerx.setEnabled(True)
@@ -476,7 +494,7 @@ class Ui_mainWindow(object):
         self.twopowerx.clicked.connect(lambda: self.function_button_press(self.input, "twopowerx"))
 
         self.gridLayout.addWidget(self.twopowerx, 0, 2, 1, 1)
-
+        ## tlačítko druhé odmocniny
         self.tworootx = QPushButton(self.layoutWidget)
         self.tworootx.setObjectName(u"tworootx")
         self.tworootx.setEnabled(True)
@@ -504,7 +522,7 @@ class Ui_mainWindow(object):
         self.tworootx.clicked.connect(lambda: self.function_button_press(self.input, "tworootx"))
 
         self.gridLayout.addWidget(self.tworootx, 0, 3, 1, 1)
-
+        ## tlačítko faktoriálu
         self.factorial = QPushButton(self.layoutWidget)
         self.factorial.setObjectName(u"factorial")
         self.factorial.setEnabled(True)
@@ -532,7 +550,7 @@ class Ui_mainWindow(object):
         self.factorial.clicked.connect(lambda: self.function_button_press(self.input, "factorial"))
 
         self.gridLayout.addWidget(self.factorial, 0, 4, 1, 1)
-
+        ## invertoru
         self.invertor = QPushButton(self.layoutWidget)
         self.invertor.setObjectName(u"invertor")
         self.invertor.setEnabled(True)
@@ -560,7 +578,7 @@ class Ui_mainWindow(object):
         self.invertor.clicked.connect(lambda: self.function_button_press(self.input, "invert"))
 
         self.gridLayout.addWidget(self.invertor, 1, 0, 1, 1)
-
+        ## tlačítko sinu
         self.sin = QPushButton(self.layoutWidget)
         self.sin.setObjectName(u"sin")
         self.sin.setEnabled(True)
@@ -588,7 +606,7 @@ class Ui_mainWindow(object):
         self.sin.clicked.connect(lambda: self.function_button_press(self.input, "sin"))
 
         self.gridLayout.addWidget(self.sin, 1, 1, 1, 1)
-
+        ## tlatko cosinu
         self.cos = QPushButton(self.layoutWidget)
         self.cos.setObjectName(u"cos")
         self.cos.setEnabled(True)
@@ -616,7 +634,7 @@ class Ui_mainWindow(object):
         self.cos.clicked.connect(lambda: self.function_button_press(self.input, "cos"))
 
         self.gridLayout.addWidget(self.cos, 1, 2, 1, 1)
-
+        ## tlačítko tangensu
         self.tan = QPushButton(self.layoutWidget)
         self.tan.setObjectName(u"tan")
         self.tan.setEnabled(True)
@@ -644,7 +662,7 @@ class Ui_mainWindow(object):
         self.tan.clicked.connect(lambda: self.function_button_press(self.input, "tan"))
 
         self.gridLayout.addWidget(self.tan, 1, 3, 1, 1)
-
+        ## tlačítko pí
         self.pi = QPushButton(self.layoutWidget)
         self.pi.setObjectName(u"pi")
         self.pi.setEnabled(True)
@@ -672,7 +690,7 @@ class Ui_mainWindow(object):
         self.pi.clicked.connect(lambda: self.function_button_press(self.input, "pi"))
 
         self.gridLayout.addWidget(self.pi, 1, 4, 1, 1)
-
+        ## tlačítko čísla 7
         self.seven = QPushButton(self.layoutWidget)
         self.seven.setObjectName(u"seven")
         self.seven.setEnabled(True)
@@ -700,7 +718,7 @@ class Ui_mainWindow(object):
         self.seven.clicked.connect(lambda: self.number_button_press(u"7"))
 
         self.gridLayout.addWidget(self.seven, 2, 0, 1, 1)
-
+        ## tlačítko čísla osm
         self.eight = QPushButton(self.layoutWidget)
         self.eight.setObjectName(u"eight")
         self.eight.setEnabled(True)
@@ -728,7 +746,7 @@ class Ui_mainWindow(object):
         self.eight.clicked.connect(lambda: self.number_button_press(u"8"))
 
         self.gridLayout.addWidget(self.eight, 2, 1, 1, 1)
-
+        ## tlačítko čísla devět
         self.nine = QPushButton(self.layoutWidget)
         self.nine.setObjectName(u"nine")
         self.nine.setEnabled(True)
@@ -756,7 +774,7 @@ class Ui_mainWindow(object):
         self.nine.clicked.connect(lambda: self.number_button_press(u"9"))
 
         self.gridLayout.addWidget(self.nine, 2, 2, 1, 1)
-
+        ## Tlačítko resetování
         self.ac = QPushButton(self.layoutWidget)
         self.ac.setObjectName(u"ac")
         self.ac.setEnabled(True)
@@ -784,7 +802,7 @@ class Ui_mainWindow(object):
         self.ac.clicked.connect(lambda: self.clear_all())
 
         self.gridLayout.addWidget(self.ac, 2, 3, 1, 1)
-
+        ## tlačítko pro vymazání jedné číslice
         self.delete = QPushButton(self.layoutWidget)
         self.delete.setObjectName(u"del")
         self.delete.setEnabled(True)
@@ -812,7 +830,7 @@ class Ui_mainWindow(object):
         self.delete.clicked.connect(lambda: self.delete_char())
 
         self.gridLayout.addWidget(self.delete, 2, 4, 1, 1)
-
+        ## tlačítko čísla 4
         self.four = QPushButton(self.layoutWidget)
         self.four.setObjectName(u"four")
         self.four.setEnabled(True)
@@ -840,7 +858,7 @@ class Ui_mainWindow(object):
         self.four.clicked.connect(lambda: self.number_button_press(u"4"))
 
         self.gridLayout.addWidget(self.four, 3, 0, 1, 1)
-
+        ## tlačítko čísla pět
         self.five = QPushButton(self.layoutWidget)
         self.five.setObjectName(u"five")
         self.five.setEnabled(True)
@@ -868,7 +886,7 @@ class Ui_mainWindow(object):
         self.five.clicked.connect(lambda: self.number_button_press(u"5"))
 
         self.gridLayout.addWidget(self.five, 3, 1, 1, 1)
-
+        ## tlačíto čísla 6
         self.six = QPushButton(self.layoutWidget)
         self.six.setObjectName(u"six")
         self.six.setEnabled(True)
@@ -896,7 +914,7 @@ class Ui_mainWindow(object):
         self.six.clicked.connect(lambda: self.number_button_press(u"6"))
 
         self.gridLayout.addWidget(self.six, 3, 2, 1, 1)
-
+        ## tlačítko operace násobení
         self.times = QPushButton(self.layoutWidget)
         self.times.setObjectName(u"times")
         self.times.setEnabled(True)
@@ -924,7 +942,7 @@ class Ui_mainWindow(object):
         self.times.clicked.connect(lambda: self.function_button_press(self.input, "times"))
 
         self.gridLayout.addWidget(self.times, 3, 3, 1, 1)
-
+        ## tlačítko operace dělení
         self.devide = QPushButton(self.layoutWidget)
         self.devide.setObjectName(u"devide")
         self.devide.setEnabled(True)
@@ -952,7 +970,7 @@ class Ui_mainWindow(object):
         self.devide.clicked.connect(lambda: self.function_button_press(self.input, "devide"))
 
         self.gridLayout.addWidget(self.devide, 3, 4, 1, 1)
-
+        ## tlačítko čísla jedna
         self.one = QPushButton(self.layoutWidget)
         self.one.setObjectName(u"one")
         self.one.setEnabled(True)
@@ -980,7 +998,7 @@ class Ui_mainWindow(object):
         self.one.clicked.connect(lambda: self.number_button_press(u"1"))
 
         self.gridLayout.addWidget(self.one, 4, 0, 1, 1)
-
+        ## tlačítko čísla 2
         self.two = QPushButton(self.layoutWidget)
         self.two.setObjectName(u"two")
         self.two.setEnabled(True)
@@ -1008,7 +1026,7 @@ class Ui_mainWindow(object):
         self.two.clicked.connect(lambda: self.number_button_press(u"2"))
 
         self.gridLayout.addWidget(self.two, 4, 1, 1, 1)
-
+        ## tlačítko čísla 3
         self.three = QPushButton(self.layoutWidget)
         self.three.setObjectName(u"three")
         self.three.setEnabled(True)
@@ -1036,7 +1054,7 @@ class Ui_mainWindow(object):
         self.three.clicked.connect(lambda: self.number_button_press(u"3"))
 
         self.gridLayout.addWidget(self.three, 4, 2, 1, 1)
-
+        ## tlačítko operace plus
         self.plus = QPushButton(self.layoutWidget)
         self.plus.setObjectName(u"plus")
         self.plus.setEnabled(True)
@@ -1064,7 +1082,7 @@ class Ui_mainWindow(object):
         self.plus.clicked.connect(lambda: self.function_button_press(self.input, "plus"))
 
         self.gridLayout.addWidget(self.plus, 4, 3, 1, 1)
-
+        ## tlačítko operace mínus
         self.minus = QPushButton(self.layoutWidget)
         self.minus.setObjectName(u"minus")
         self.minus.setEnabled(True)
@@ -1092,7 +1110,7 @@ class Ui_mainWindow(object):
         self.minus.clicked.connect(lambda: self.decide_minus())
 
         self.gridLayout.addWidget(self.minus, 4, 4, 1, 1)
-
+        ## tlačítko deseinné čárky
         self.comma = QPushButton(self.layoutWidget)
         self.comma.setObjectName(u"comma")
         self.comma.setEnabled(True)
@@ -1120,7 +1138,7 @@ class Ui_mainWindow(object):
         self.comma.clicked.connect(lambda: self.number_button_press(u","))
 
         self.gridLayout.addWidget(self.comma, 5, 0, 1, 1)
-
+        ## tlačítko čísla nula
         self.zero = QPushButton(self.layoutWidget)
         self.zero.setObjectName(u"zero")
         self.zero.setEnabled(True)
@@ -1148,7 +1166,7 @@ class Ui_mainWindow(object):
         self.zero.clicked.connect(lambda: self.number_button_press(u"0"))
 
         self.gridLayout.addWidget(self.zero, 5, 1, 1, 1)
-
+        ## tlačítko paměti posledního výsledku
         self.Ans = QPushButton(self.layoutWidget)
         self.Ans.setObjectName(u"Ans")
         self.Ans.setEnabled(True)
@@ -1176,7 +1194,7 @@ class Ui_mainWindow(object):
         self.Ans.clicked.connect(lambda: self.function_button_press(self.input, "ans"))
 
         self.gridLayout.addWidget(self.Ans, 5, 2, 1, 1)
-
+        ## tlačítko operace rovná se
         self.equals = QPushButton(self.layoutWidget)
         self.equals.setObjectName(u"equals")
         self.equals.setEnabled(True)
@@ -1204,7 +1222,7 @@ class Ui_mainWindow(object):
         self.equals.clicked.connect(lambda: self.function_button_press(self.input, "equals"))
 
         self.gridLayout.addWidget(self.equals, 5, 3, 1, 1)
-
+        ## tlačítko pro nápovědu
         self.guide = QPushButton(self.layoutWidget)
         self.guide.setObjectName(u"guide")
         self.guide.setEnabled(True)
@@ -1232,13 +1250,15 @@ class Ui_mainWindow(object):
         self.guide.clicked.connect(lambda: webbrowser.open_new(self.guide_path))
 
         self.gridLayout.addWidget(self.guide, 5, 4, 1, 1)
-
+        ## tlačítko rozložení středního widgetu
         self.layoutWidget1 = QWidget(self.centralwidget)
         self.layoutWidget1.setObjectName(u"layoutWidget1")
         self.layoutWidget1.setGeometry(QRect(0, 0, 441, 133))
+        ## tlačítko vertikálního rozložení
         self.verticalLayout = QVBoxLayout(self.layoutWidget1)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        ## štítek s formátovanou operací
         self.buffer_label = QLabel(self.layoutWidget1)
         self.buffer_label.setObjectName(u"buffer_label")
         self.buffer_label.setMaximumSize(QSize(400, 100))
@@ -1254,7 +1274,7 @@ class Ui_mainWindow(object):
         self.buffer_label.setMargin(15)
 
         self.verticalLayout.addWidget(self.buffer_label)
-
+        ## štítek s uživatelským vstupem
         self.action_label = QLabel(self.layoutWidget1)
         self.action_label.setObjectName(u"action_label")
         self.action_label.setMaximumSize(QSize(400, 100))
@@ -1270,6 +1290,7 @@ class Ui_mainWindow(object):
         self.verticalLayout.addWidget(self.action_label)
 
         mainWindow.setCentralWidget(self.centralwidget)
+        ## element menu
         self.menubar = QMenuBar(mainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 400, 23))
@@ -1288,6 +1309,7 @@ class Ui_mainWindow(object):
                                    "QMenuBar::item:pressed {\n"
                                    "    background: rgb(120,120,120);\n"
                                    "}")
+        ## položka menu
         self.menuasd = QMenu(self.menubar)
         self.menuasd.setObjectName(u"menuasd")
         self.menuasd.setStyleSheet(u"QMenu {\n"
@@ -1297,10 +1319,11 @@ class Ui_mainWindow(object):
         self.statusbar = QStatusBar(mainWindow)
         self.statusbar.setObjectName(u"statusbar")
         mainWindow.setStatusBar(self.statusbar)
-
+        ## položka nápovědy v menu
         self.actionNapoveda = QAction(mainWindow)
         self.actionNapoveda.setObjectName(u"actionNapoveda")
         self.actionNapoveda.triggered.connect(lambda: webbrowser.open_new(self.guide_path))
+        ## položka manuálu v menu
         self.actionManual = QAction(mainWindow)
         self.actionManual.setObjectName(u"actionDokumentace")
         self.actionManual.triggered.connect(lambda: webbrowser.open_new(self.doc_path))
@@ -1308,6 +1331,7 @@ class Ui_mainWindow(object):
         self.menubar.addAction(self.menuasd.menuAction())
 
         mainWindow.setMenuBar(self.menubar)
+        ## element vrchního menu
         self.statusbar = QStatusBar(mainWindow)
         self.statusbar.setObjectName(u"statusbar")
         mainWindow.setStatusBar(self.statusbar)
