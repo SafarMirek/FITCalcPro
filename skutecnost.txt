@@ -1,0 +1,11 @@
+====================================
+ROZDÍLY MEZI PLÁNY A SKUTEČNOSTÍ
+====================================
+- Ke komunikaci byl místo platformy Space používán ve větší míře Messenger, kde byla komunikace bezproblémová - každý člen reagoval prakticky ihned.
+
+- Nedodržení deadlinů některých úloh - byly splněny s velkým zpožděním a ostatní členové museli čekat.
+- Některé úlohy zabraly více času, než bylo plánováno.
+
+- Projekt byl dokončen s týdenním zpožděním, než bylo původně zamýšleno. Díky časové rezervě byl však projekt odvezdán včas.
+
+- Místo codereviews bylo použito párové programování.

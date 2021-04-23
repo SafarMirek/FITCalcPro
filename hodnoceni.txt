@@ -1,0 +1,4 @@
+xsafar23 100 (testy mat. knihovny,makefile, instalátor)
+xmudra04 100 (GUI, mockup)
+xparil04 100 (uživatelská dokumentace, README, profiling)
+xkrizo05 100 (mat. knihovna, dokumentace)
