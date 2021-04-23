@@ -116,7 +116,7 @@ def error_hook(exctype, value, traceback):
 #
 def run():
     window.show()
-    exit(app.exec_())
+    app.exec_()
 
 
 sys.excepthook = error_hook

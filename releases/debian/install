@@ -1,0 +1,3 @@
+install/fitcalcpro.xpm /usr/share/pixmaps
+install/fitcalcpro.desktop /usr/share/applications
+install/fitcalcpro /usr/bin

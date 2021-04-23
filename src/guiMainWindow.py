@@ -53,11 +53,11 @@ class Ui_mainWindow(object):
         ## přepínač indikující, že je číslo připravené pro operaci
         self.num_is_ready = False
         ## přepínač indikující, že je potřeba zadat operaci
-        self.operation_needed = False
+        self.operation_needed = 
         ## cesta k dokumentaci
-        self.doc_path = f"{os.path.dirname(sys.argv[0])}/TODO" # TODO
+        self.doc_path = f"{os.path.dirname(sys.argv[0])}/user_documentation.pdf"
         ## cesta k nápovědě
-        self.guide_path = f"{os.path.dirname(sys.argv[0])}/TODO" # TODO
+        self.guide_path = f"{os.path.dirname(sys.argv[0])}/help.pdf"
         ## pole akcí kalkulačky
         self.buttonActions = [
             ButtonAction("sin", "sin({value})", lambda a: sin(a), True),
@@ -1247,7 +1247,7 @@ class Ui_mainWindow(object):
                                  "	color: rgb(255, 255, 255);\n"
                                  "}")
         self.guide.setFlat(True)
-        self.guide.clicked.connect(lambda: webbrowser.open_new(self.doc_path))
+        self.guide.clicked.connect(lambda: webbrowser.open_new(self.guide_path))
 
         self.gridLayout.addWidget(self.guide, 5, 4, 1, 1)
         ## tlačítko rozložení středního widgetu
