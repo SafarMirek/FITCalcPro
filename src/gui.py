@@ -1,7 +1,16 @@
 # Graficke uzivatelske rozhrani
-
 # Autor: Matěj Mudra
 # Datum: 4.3.2021
+
+##
+# @file gui.py
+# @brief Graficke uzivatelske rozhrani
+# @author Matěj Mudra <xmudra04.stud.fit.vutbr.cz>
+#
+# * Project: fit-ivs-2
+# * Date created: 2021-03-04
+# * Last modified: 2021-04-23
+#
 
 import sys
 
@@ -15,8 +24,12 @@ from guiMainWindow import Ui_mainWindow
 # @brief Třída hlavního okna
 #
 class MainWindow(QMainWindow):
+    ##
+    # @brief Konstruktor
+    #
     def __init__(self):
         super(MainWindow, self).__init__()
+        ## rozložení gui
         self.ui = Ui_mainWindow()
         self.ui.setupUi(self)
         self.setWindowIcon(QIcon("FITCalcProIcon.png"))
@@ -77,6 +90,7 @@ class MainWindow(QMainWindow):
     # @brief Vypíše chybu v separátním podokně a ukončí aplikaci
     #
     def show_error_window(self):
+        ## vyskakovací hláška s chybou
         self.error = QMessageBox()
         self.error.setWindowTitle("Chyba")
         self.error.setInformativeText("Omlouváme se, něco se nepovedlo.")
@@ -106,7 +120,9 @@ def run():
 
 
 sys.excepthook = error_hook
+## jádro aplikace
 app = QApplication(sys.argv)
+## okno kalkulačky
 window = MainWindow()
 
 run()

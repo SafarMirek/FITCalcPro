@@ -1,3 +1,13 @@
+##
+# @file math_interpreter.py
+# @brief Interpretuje matematický výraz
+# @author Miroslav Šafář <xsafar23.stud.fit.vutbr.cz>
+#
+# * Project: fit-ivs-2
+# * Date created: 2021-03-29
+# * Last modified: 2021-04-23
+#
+
 import math_lib
 
 
