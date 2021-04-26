@@ -53,7 +53,7 @@ class Ui_mainWindow(object):
         ## přepínač indikující, že je číslo připravené pro operaci
         self.num_is_ready = False
         ## přepínač indikující, že je potřeba zadat operaci
-        self.operation_needed = 
+        self.operation_needed = False
         ## cesta k dokumentaci
         self.doc_path = f"{os.path.dirname(sys.argv[0])}/dokumentace.pdf"
         ## cesta k nápovědě
