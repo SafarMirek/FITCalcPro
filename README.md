@@ -12,7 +12,7 @@ Kalkulačka s grafickým uživatelským rozhraním vytvořená v rámci students
 Instalace
 ---------
 1. Ujistěte se, že máte alespon 130 MB volného místa na disku a přístup k internetu
-2. Stáhněte (tento-odkaz na stažení) instalační balíček a přejděte do složky s instalátorem
+2. Stáhněte [zde](https://github.com/SafarMirek/FITCalcPro/releases/tag/v1.0) instalační balíček a přejděte do složky s instalátorem
 3. Dvakrát klikněte na .deb soubor, který otevře instalační okno
 4. Zvolte tlačítko Install a vyčkejte na stažení 
 
