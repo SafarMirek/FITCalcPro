@@ -55,7 +55,7 @@ class Ui_mainWindow(object):
         ## přepínač indikující, že je potřeba zadat operaci
         self.operation_needed = 
         ## cesta k dokumentaci
-        self.doc_path = f"{os.path.dirname(sys.argv[0])}/user_documentation.pdf"
+        self.doc_path = f"{os.path.dirname(sys.argv[0])}/dokumentace.pdf"
         ## cesta k nápovědě
         self.guide_path = f"{os.path.dirname(sys.argv[0])}/help.pdf"
         ## pole akcí kalkulačky
